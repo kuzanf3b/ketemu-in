@@ -1,0 +1,48 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile containing name and WhatsApp contact info",
+      "type": "object",
+      "properties": {
+        "id_user": { "type": "string", "maxLength": 128 },
+        "nama_lengkap": { "type": "string", "maxLength": 100 },
+        "no_whatsapp": { "type": "string", "maxLength": 20 },
+        "created_at": { "type": "string" },
+        "is_admin": { "type": "boolean" }
+      },
+      "required": ["id_user", "nama_lengkap", "no_whatsapp", "created_at"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Lost or found item report posted by a resident",
+      "type": "object",
+      "properties": {
+        "id_report": { "type": "string", "maxLength": 128 },
+        "id_user": { "type": "string", "maxLength": 128 },
+        "tipe_laporan": { "type": "string", "enum": ["HILANG", "DITEMUKAN"] },
+        "kategori": { "type": "string", "maxLength": 50 },
+        "judul": { "type": "string", "maxLength": 150 },
+        "deskripsi": { "type": "string", "maxLength": 1000 },
+        "foto_url": { "type": "string", "maxLength": 1000000 },
+        "lokasi": { "type": "string", "maxLength": 200 },
+        "tgl_kejadian": { "type": "string" },
+        "status_selesai": { "type": "boolean" },
+        "created_at": { "type": "string" },
+        "user_nama": { "type": "string", "maxLength": 100 },
+        "user_whatsapp": { "type": "string", "maxLength": 20 }
+      },
+      "required": ["id_report", "id_user", "tipe_laporan", "kategori", "judul", "deskripsi", "lokasi", "tgl_kejadian", "status_selesai", "created_at", "user_nama", "user_whatsapp"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Collection of user profiles keyed by their Firebase Auth UID"
+    },
+    "reports/{reportId}": {
+      "schema": "Report",
+      "description": "Collection of lost & found reports"
+    }
+  }
+}

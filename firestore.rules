@@ -1,0 +1,111 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitive Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Helper to check if user is an admin
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('is_admin', false) == true;
+    }
+
+    // 1. User Entity Validation
+    function isValidUser(data) {
+      return data.keys().hasAll(['id_user', 'nama_lengkap', 'no_whatsapp', 'created_at'])
+          && data.keys().size() <= 5
+          && data.id_user is string && data.id_user.size() <= 128
+          && data.nama_lengkap is string && data.nama_lengkap.size() >= 1 && data.nama_lengkap.size() <= 100
+          && data.no_whatsapp is string && data.no_whatsapp.size() >= 9 && data.no_whatsapp.size() <= 20
+          && data.created_at is string
+          && (!data.keys().contains('is_admin') || data.is_admin is bool);
+    }
+
+    // 2. Report Entity Validation
+    function isValidReport(data) {
+      return data.keys().hasAll([
+            'id_report', 'id_user', 'tipe_laporan', 'kategori', 'judul', 
+            'deskripsi', 'lokasi', 'tgl_kejadian', 'status_selesai', 
+            'created_at', 'user_nama', 'user_whatsapp', 'foto_url'
+          ])
+          && data.keys().size() == 13
+          && data.id_report is string && data.id_report.size() <= 128
+          && data.id_user is string && data.id_user.size() <= 128
+          && (data.tipe_laporan == 'HILANG' || data.tipe_laporan == 'DITEMUKAN')
+          && data.kategori is string && data.kategori.size() <= 50
+          && data.judul is string && data.judul.size() >= 3 && data.judul.size() <= 150
+          && data.deskripsi is string && data.deskripsi.size() <= 1000
+          && data.foto_url is string && data.foto_url.size() <= 1000000
+          && data.lokasi is string && data.lokasi.size() <= 200
+          && data.tgl_kejadian is string
+          && data.status_selesai is bool
+          && data.created_at is string
+          && data.user_nama is string && data.user_nama.size() <= 100
+          && data.user_whatsapp is string && data.user_whatsapp.size() <= 20;
+    }
+
+    // Match users
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && userId == request.auth.uid && isValidUser(incoming()) && incoming().get('is_admin', false) == false;
+      allow update: if isSignedIn() && (
+        (userId == request.auth.uid && isValidUser(incoming()) && incoming().get('is_admin', false) == existing().get('is_admin', false)) ||
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Match reports
+    match /reports/{reportId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      
+      allow create: if isSignedIn() 
+                    && isValidId(reportId)
+                    && incoming().id_user == request.auth.uid
+                    && isValidReport(incoming())
+                    && incoming().status_selesai == false;
+                    
+      allow update: if isSignedIn() && (
+        // Action: Resolve/Finish (Owner can mark their report as resolved)
+        (existing().id_user == request.auth.uid 
+         && isValidReport(incoming())
+         && incoming().id_user == existing().id_user
+         && incoming().tipe_laporan == existing().tipe_laporan
+         && incoming().kategori == existing().kategori
+         && incoming().judul == existing().judul
+         && incoming().deskripsi == existing().deskripsi
+         && incoming().foto_url == existing().foto_url
+         && incoming().lokasi == existing().lokasi
+         && incoming().tgl_kejadian == existing().tgl_kejadian
+         && incoming().created_at == existing().created_at
+         && incoming().user_nama == existing().user_nama
+         && incoming().user_whatsapp == existing().user_whatsapp
+         && incoming().diff(existing()).affectedKeys().hasOnly(['status_selesai']))
+        || isAdmin()
+      );
+      
+      allow delete: if isSignedIn() && (existing().id_user == request.auth.uid || isAdmin());
+    }
+  }
+}
