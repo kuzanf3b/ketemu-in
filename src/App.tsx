@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { db, auth, handleFirestoreError, OperationType } from './lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
+import logo from './assets/logo-black.png'
 
 const CATEGORIES: ('Semua' | Category)[] = ['Semua', 'Elektronik', 'Kunci', 'Dompet', 'Hewan', 'Dokumen', 'Lainnya'];
 
@@ -26,7 +27,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [selectedTipe, setSelectedTipe] = useState<string>('Semua'); // 'Semua' | 'HILANG' | 'DITEMUKAN'
   const [authInitialized, setAuthInitialized] = useState(false);
-  
+
   // Modals state
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -54,7 +55,7 @@ export default function App() {
     try {
       const reportsRef = collection(db, 'reports');
       let q = query(reportsRef);
-      
+
       if (selectedCategory !== 'Semua') {
         q = query(q, where('kategori', '==', selectedCategory));
       }
@@ -71,7 +72,7 @@ export default function App() {
       // Filter by search query client-side
       if (searchQuery) {
         const sq = searchQuery.toLowerCase();
-        fetchedReports = fetchedReports.filter(r => 
+        fetchedReports = fetchedReports.filter(r =>
           (r.judul || '').toLowerCase().includes(sq) ||
           (r.deskripsi || '').toLowerCase().includes(sq) ||
           (r.lokasi || '').toLowerCase().includes(sq)
@@ -80,7 +81,7 @@ export default function App() {
 
       // Sort by newest created_at first
       fetchedReports.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      
+
       setReports(fetchedReports);
     } catch (err) {
       console.error('Error fetching reports:', err);
@@ -159,14 +160,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
-      
+
       {/* Top Navbar Header */}
       <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-extrabold shadow-sm">
-              KI
-            </div>
+            <img className="w-15" src={logo} alt="" />
             <div>
               <h1 className="text-lg font-black tracking-tight text-slate-900">
                 Ketemu.in
@@ -209,7 +208,7 @@ export default function App() {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 pb-24">
         {currentTab === 'home' ? (
           <div className="space-y-6">
-            
+
             {/* Header Greeting & Banner */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
@@ -232,7 +231,7 @@ export default function App() {
 
             {/* Filter, Search & Sorting Controls */}
             <div className="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm space-y-4">
-              
+
               {/* Row 1: Search and Type Filter */}
               <div className="flex flex-col md:flex-row gap-3">
                 <div className="relative flex-1">

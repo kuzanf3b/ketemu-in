@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
+import logo from '../assets/logo-white.png';
 
 interface LoginRegisterProps {
   onLoginSuccess: (user: User) => void;
@@ -124,8 +125,8 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
       {/* Brand Header */}
       <div className="bg-slate-900 px-6 py-8 text-center text-white relative">
         <div className="relative z-10">
-          <div className="w-12 h-12 bg-white/10 border border-white/10 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-inner">
-            <span className="text-xl font-bold tracking-tight font-sans text-white">KI</span>
+          <div className="flex justify-center">
+            <img className="w-20" src={logo} alt="" />
           </div>
           <h2 className="text-2xl font-extrabold font-sans tracking-tight">Ketemu.in</h2>
           <p className="text-slate-400 text-xs mt-1">
