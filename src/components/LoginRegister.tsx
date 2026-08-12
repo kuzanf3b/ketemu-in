@@ -128,7 +128,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           <div className="flex justify-center">
             <img className="w-20" src={logo} alt="" />
           </div>
-          <h2 className="text-2xl font-extrabold font-sans tracking-tight">Ketemu.in</h2>
+          <h2 className="text-2xl font-extrabold font-sans tracking-tight">KetemuIn</h2>
           <p className="text-slate-400 text-xs mt-1">
             Lost & Found Digital Lingkungan Rukun Tetangga (RT/RW)
           </p>
@@ -273,7 +273,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
 
         <div className="mt-6 pt-4 border-t border-slate-100 text-center">
           <p className="text-xs text-slate-400 leading-normal">
-            Ketemu.in menjamin keaslian data warga dengan mengaitkan nomor WhatsApp untuk menghindari laporan fiktif atau spam demi kenyamanan bersama.
+            KetemuIn menjamin keaslian data warga dengan mengaitkan nomor WhatsApp untuk menghindari laporan fiktif atau spam demi kenyamanan bersama.
           </p>
         </div>
       </div>

@@ -168,7 +168,7 @@ export default function App() {
             <img className="w-15" src={logo} alt="" />
             <div>
               <h1 className="text-lg font-black tracking-tight text-slate-900">
-                Ketemu.in
+                KetemuIn
               </h1>
               <p className="text-[10px] text-slate-400 font-semibold tracking-wide">Lost & Found RW 04</p>
             </div>
@@ -364,7 +364,7 @@ export default function App() {
 
       {/* Footer copyright */}
       <footer className="bg-white border-t border-slate-100 py-6 text-center text-xs text-slate-400">
-        <p>© 2026 Ketemu.in RW 04. Dibuat dengan kejujuran & kepedulian sosial.</p>
+        <p>© 2026 KetemuIn RW 04. Dibuat dengan kejujuran & kepedulian sosial.</p>
       </footer>
 
       {/* Overlays / Modals */}

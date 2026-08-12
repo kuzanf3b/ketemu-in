@@ -1,4 +1,4 @@
-# Security Specification: Ketemu.in
+# Security Specification: KetemuIn
 
 ## Data Invariants
 1. Users can only modify their own user document under `/users/{userId}` where `userId` matches the Authenticated `request.auth.uid`.

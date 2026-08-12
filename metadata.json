@@ -1,5 +1,5 @@
 {
-  "name": "Ketemu.in",
+  "name": "KetemuIn",
   "description": "Aplikasi digital Lost & Found lingkungan warga untuk melaporkan dan menemukan barang atau hewan peliharaan hilang.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

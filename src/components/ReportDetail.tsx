@@ -78,7 +78,7 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
     if (phone.startsWith('0')) {
       phone = '62' + phone.substring(1);
     }
-    const text = `Halo ${report.user_nama}, saya melihat laporan Anda di aplikasi Ketemu.in mengenai "${report.judul}". Apakah barang/hewan tersebut sudah ada perkembangan?`;
+    const text = `Halo ${report.user_nama}, saya melihat laporan Anda di aplikasi KetemuIn mengenai "${report.judul}". Apakah barang/hewan tersebut sudah ada perkembangan?`;
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   };
 
