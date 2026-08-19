@@ -121,22 +121,22 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
   };
 
   return (
-    <div id="login-container" className="w-full max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div id="login-container" className="w-full max-w-md mx-auto bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
       {/* Brand Header */}
-      <div className="bg-slate-900 px-6 py-8 text-center text-white relative">
+      <div className="bg-primary px-6 py-8 text-center text-primary-foreground relative">
         <div className="relative z-10">
           <div className="flex justify-center">
             <img className="w-20" src={logo} alt="" />
           </div>
           <h2 className="text-2xl font-extrabold font-sans tracking-tight">KetemuIn</h2>
-          <p className="text-slate-400 text-xs mt-1">
+          <p className="text-muted-foreground text-xs mt-1">
             Lost & Found Digital Lingkungan Rukun Tetangga (RT/RW)
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-100">
+      <div className="flex border-b border-border">
         <button
           id="btn-tab-login"
           type="button"
@@ -146,8 +146,8 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           }}
           className={`flex-1 py-4.5 text-center font-bold text-xs uppercase tracking-wider transition-colors ${
             isLogin
-              ? 'text-slate-900 border-b-2 border-slate-900 bg-slate-50/50'
-              : 'text-slate-400 hover:text-slate-800 hover:bg-slate-50/20'
+              ? 'text-foreground border-b-2 border-slate-900 bg-accent/50'
+              : 'text-muted-foreground hover:text-foreground hover:bg-accent/20'
           }`}
         >
           Masuk Akun
@@ -161,8 +161,8 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           }}
           className={`flex-1 py-4.5 text-center font-bold text-xs uppercase tracking-wider transition-colors ${
             !isLogin
-              ? 'text-slate-900 border-b-2 border-slate-900 bg-slate-50/50'
-              : 'text-slate-400 hover:text-slate-800 hover:bg-slate-50/20'
+              ? 'text-foreground border-b-2 border-slate-900 bg-accent/50'
+              : 'text-muted-foreground hover:text-foreground hover:bg-accent/20'
           }`}
         >
           Daftar Baru
@@ -184,9 +184,9 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-600 block">Nama Lengkap</label>
+              <label className="text-xs font-semibold text-muted-foreground block">Nama Lengkap</label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                   <UserRound className="w-4 h-4" />
                 </span>
                 <input
@@ -195,7 +195,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                   placeholder="Contoh: Budi Santoso"
                   value={namaLengkap}
                   onChange={(e) => setNamaLengkap(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all text-slate-800"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
                   required={!isLogin}
                 />
               </div>
@@ -203,9 +203,9 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           )}
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 block">No. WhatsApp</label>
+            <label className="text-xs font-bold text-muted-foreground block">No. WhatsApp</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                 <Phone className="w-4 h-4" />
               </span>
               <input
@@ -214,19 +214,19 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                 placeholder="Contoh: 081234567890"
                 value={noWhatsapp}
                 onChange={(e) => setNoWhatsapp(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all text-slate-800"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
                 required
               />
             </div>
-            <p className="text-[10px] text-slate-400 leading-tight">
+            <p className="text-[10px] text-muted-foreground leading-tight">
               Digunakan untuk login dan agar warga lain bisa menghubungi Anda langsung via WhatsApp.
             </p>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 block">Kata Sandi</label>
+            <label className="text-xs font-bold text-muted-foreground block">Kata Sandi</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                 <KeyRound className="w-4 h-4" />
               </span>
               <input
@@ -235,13 +235,13 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all text-slate-800"
+                className="w-full pl-10 pr-10 py-2.5 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-muted-foreground"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -252,11 +252,11 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             id="btn-auth-submit"
             type="submit"
             disabled={loading}
-            className="w-full mt-4 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-xl transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full mt-4 bg-primary hover:bg-secondary text-primary-foreground font-bold py-2.5 px-4 rounded-xl transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-4 w-4 text-primary-foreground" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -271,8 +271,8 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           </button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-slate-100 text-center">
-          <p className="text-xs text-slate-400 leading-normal">
+        <div className="mt-6 pt-4 border-t border-border text-center">
+          <p className="text-xs text-muted-foreground leading-normal">
             KetemuIn menjamin keaslian data warga dengan mengaitkan nomor WhatsApp untuk menghindari laporan fiktif atau spam demi kenyamanan bersama.
           </p>
         </div>
@@ -280,3 +280,4 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
     </div>
   );
 }
+

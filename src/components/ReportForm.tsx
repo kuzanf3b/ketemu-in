@@ -183,23 +183,23 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/60 backdrop-blur-sm overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.2 }}
-        className="relative bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col"
+        className="relative bg-card w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl border border-border max-h-[90vh] flex flex-col"
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-accent">
           <div>
-            <h3 className="text-lg font-bold text-slate-800">Buat Laporan Baru</h3>
-            <p className="text-xs text-slate-500">Tulis info barang/hewan hilang atau ditemukan</p>
+            <h3 className="text-lg font-bold text-foreground">Buat Laporan Baru</h3>
+            <p className="text-xs text-muted-foreground">Tulis info barang/hewan hilang atau ditemukan</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
+            className="p-2 text-muted-foreground hover:text-muted-foreground rounded-full hover:bg-muted transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -216,16 +216,16 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
           {/* Tipe Laporan Toggle */}
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 block">Tipe Laporan</label>
-            <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl">
+            <label className="text-xs font-bold text-muted-foreground block">Tipe Laporan</label>
+            <div className="grid grid-cols-2 gap-2 bg-muted p-1.5 rounded-2xl">
               <button
                 type="button"
                 id="btn-toggle-hilang"
                 onClick={() => setTipeLaporan('HILANG')}
                 className={`py-2 text-center text-xs font-bold rounded-xl transition-all ${
                   tipeLaporan === 'HILANG'
-                    ? 'bg-rose-500 text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-rose-500 text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-muted-foreground'
                 }`}
               >
                 🔴 HILANG / KEHILANGAN
@@ -236,8 +236,8 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
                 onClick={() => setTipeLaporan('DITEMUKAN')}
                 className={`py-2 text-center text-xs font-bold rounded-xl transition-all ${
                   tipeLaporan === 'DITEMUKAN'
-                    ? 'bg-emerald-500 text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-emerald-500 text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-muted-foreground'
                 }`}
               >
                 🟢 DITEMUKAN / PENEMUAN
@@ -247,7 +247,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
           {/* Kategori Selector */}
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 block">Kategori</label>
+            <label className="text-xs font-bold text-muted-foreground block">Kategori</label>
             <div className="grid grid-cols-3 gap-2">
               {CATEGORIES.map((cat) => (
                 <button
@@ -261,8 +261,8 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
                   }}
                   className={`py-2 text-center text-xs font-semibold border rounded-xl transition-all ${
                     kategori === cat
-                      ? 'border-slate-900 bg-slate-50 text-slate-900 font-bold'
-                      : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      ? 'border-slate-900 bg-accent text-foreground font-bold'
+                      : 'border-border text-muted-foreground hover:border-border hover:bg-accent'
                   }`}
                 >
                   {cat}
@@ -273,7 +273,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
           {/* Judul Laporan */}
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 block">Judul Laporan</label>
+            <label className="text-xs font-bold text-muted-foreground block">Judul Laporan</label>
             <input
               id="form-report-title"
               type="text"
@@ -281,30 +281,30 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
               maxLength={150}
               value={judul}
               onChange={(e) => setJudul(e.target.value)}
-              className="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all text-slate-800"
+              className="w-full px-4 py-2 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
               required
             />
           </div>
 
           {/* Deskripsi */}
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 block">Deskripsi & Ciri Khusus</label>
+            <label className="text-xs font-bold text-muted-foreground block">Deskripsi & Ciri Khusus</label>
             <textarea
               id="form-report-desc"
               rows={3}
               placeholder="Tulis ciri-ciri detail (misal: warna casing, gantungan kunci boneka beruang, bekas lecet, dll)"
               value={deskripsi}
               onChange={(e) => setDeskripsi(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all text-slate-800 resize-none"
+              className="w-full px-4 py-2.5 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground resize-none"
               required
             />
           </div>
 
           {/* Lokasi Kejadian */}
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 block">Perkiraan Lokasi</label>
+            <label className="text-xs font-bold text-muted-foreground block">Perkiraan Lokasi</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                 <MapPin className="w-4 h-4" />
               </span>
               <input
@@ -313,7 +313,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
                 placeholder="Contoh: Depan warung kelontong RT 02"
                 value={lokasi}
                 onChange={(e) => setLokasi(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all text-slate-800"
+                className="w-full pl-10 pr-4 py-2 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
                 required
               />
             </div>
@@ -321,9 +321,9 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
           {/* Tanggal Kejadian */}
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-600 block">Tanggal Kejadian</label>
+            <label className="text-xs font-bold text-muted-foreground block">Tanggal Kejadian</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                 <Calendar className="w-4 h-4" />
               </span>
               <input
@@ -331,7 +331,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
                 type="date"
                 value={tglKejadian}
                 onChange={(e) => setTglKejadian(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 transition-all text-slate-800"
+                className="w-full pl-10 pr-4 py-2 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
                 required
               />
             </div>
@@ -339,15 +339,15 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
           {/* Foto Upload dengan Drag and Drop */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-600 block">Foto Barang</label>
+            <label className="text-xs font-bold text-muted-foreground block">Foto Barang</label>
             
             {fotoUrl ? (
-              <div className="relative rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 aspect-video flex items-center justify-center">
+              <div className="relative rounded-2xl border border-border overflow-hidden bg-accent aspect-video flex items-center justify-center">
                 <img src={fotoUrl} alt="Preview" className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={() => setFotoUrl('')}
-                  className="absolute top-2 right-2 p-2 bg-red-500/85 hover:bg-red-600 text-white rounded-full transition-all shadow-md"
+                  className="absolute top-2 right-2 p-2 bg-red-500/85 hover:bg-red-600 text-primary-foreground rounded-full transition-all shadow-md"
                   title="Hapus Foto"
                 >
                   <X className="w-4 h-4" />
@@ -362,8 +362,8 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
                 onClick={() => fileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${
                   dragActive
-                    ? 'border-slate-900 bg-slate-50'
-                    : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-50'
+                    ? 'border-slate-900 bg-accent'
+                    : 'border-border bg-accent/50 hover:border-border hover:bg-accent'
                 }`}
               >
                 <input
@@ -373,12 +373,12 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                <div className="p-3 bg-white rounded-full shadow-sm text-slate-500 border border-slate-100">
+                <div className="p-3 bg-card rounded-full shadow-sm text-muted-foreground border border-border">
                   <Upload className="w-5 h-5" />
                 </div>
                 <div className="text-center">
-                  <p className="text-xs font-bold text-slate-700">Tarik & lepas gambar di sini, atau klik untuk memilih</p>
-                  <p className="text-[10px] text-slate-400 mt-1 font-semibold">PNG, JPG, JPEG (Maks. 10MB). Laporan tanpa foto akan menggunakan gambar ilustrasi default.</p>
+                  <p className="text-xs font-bold text-muted-foreground">Tarik & lepas gambar di sini, atau klik untuk memilih</p>
+                  <p className="text-[10px] text-muted-foreground mt-1 font-semibold">PNG, JPG, JPEG (Maks. 10MB). Laporan tanpa foto akan menggunakan gambar ilustrasi default.</p>
                 </div>
               </div>
             )}
@@ -386,11 +386,11 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
         </form>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-end">
+        <div className="px-6 py-4 border-t border-border bg-accent flex gap-3 justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all"
+            className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all"
           >
             Batal
           </button>
@@ -398,7 +398,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
             id="btn-submit-report"
             onClick={handleSubmit}
             disabled={loading}
-            className="px-6 py-2 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all disabled:opacity-50"
+            className="px-6 py-2 text-sm font-bold text-primary-foreground bg-primary hover:bg-secondary rounded-xl transition-all disabled:opacity-50"
           >
             {loading ? 'Menyimpan...' : 'Kirim Laporan'}
           </button>
@@ -407,3 +407,4 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
     </div>
   );
 }
+

@@ -32,7 +32,7 @@ export default function ConfirmModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onCancel}
-            className="fixed inset-0 bg-slate-950/45 backdrop-blur-[2px]"
+            className="fixed inset-0 bg-foreground/45 backdrop-blur-[2px]"
           />
 
           {/* Modal Card */}
@@ -41,12 +41,12 @@ export default function ConfirmModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', duration: 0.3 }}
-            className="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-100 z-10 overflow-hidden flex flex-col gap-4"
+            className="relative bg-card w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-border z-10 overflow-hidden flex flex-col gap-4"
           >
             {/* Close Button */}
             <button
               onClick={onCancel}
-              className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+              className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-muted-foreground transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -65,10 +65,10 @@ export default function ConfirmModal({
                 )}
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-extrabold text-slate-800 leading-tight">
+                <h3 className="text-base font-extrabold text-foreground leading-tight">
                   {title}
                 </h3>
-                <p className="text-slate-500 text-xs leading-relaxed font-medium">
+                <p className="text-muted-foreground text-xs leading-relaxed font-medium">
                   {message}
                 </p>
               </div>
@@ -79,17 +79,17 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 rounded-xl transition-all"
+                className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground bg-accent hover:bg-muted rounded-xl transition-all"
               >
                 {cancelText}
               </button>
               <button
                 type="button"
                 onClick={onConfirm}
-                className={`px-4 py-2 text-xs font-bold text-white rounded-xl transition-all shadow-md ${
+                className={`px-4 py-2 text-xs font-bold text-primary-foreground rounded-xl transition-all shadow-md ${
                   isDanger
                     ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/10 hover:shadow-rose-600/20'
-                    : 'bg-slate-900 hover:bg-slate-800 shadow-slate-950/10 hover:shadow-slate-950/20'
+                    : 'bg-primary hover:bg-secondary shadow-primary/10 hover:shadow-primary/20'
                 }`}
               >
                 {confirmText}
@@ -101,3 +101,4 @@ export default function ConfirmModal({
     </AnimatePresence>
   );
 }
+

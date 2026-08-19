@@ -93,22 +93,22 @@ export default function ProfileView({
   return (
     <div className="space-y-6">
       {/* Profile Header Card */}
-      <div id="profile-card" className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div id="profile-card" className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-800">
+          <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center text-foreground">
             <UserIcon className="w-7 h-7" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-slate-800">{currentUser.nama_lengkap}</h2>
+              <h2 className="text-xl font-bold text-foreground">{currentUser.nama_lengkap}</h2>
               {currentUser.is_admin && (
                 <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
                   Admin RT
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-slate-500 text-sm mt-0.5">
-              <Phone className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 text-muted-foreground text-sm mt-0.5">
+              <Phone className="w-3.5 h-3.5 text-muted-foreground" />
               <span>+{currentUser.no_whatsapp}</span>
             </div>
           </div>
@@ -126,9 +126,9 @@ export default function ProfileView({
 
       {/* Stats Section */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm text-center">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Total Pos</span>
-          <span className="text-2xl font-black text-slate-800 mt-1 block">{totalReports}</span>
+        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Total Pos</span>
+          <span className="text-2xl font-black text-foreground mt-1 block">{totalReports}</span>
         </div>
         <div className="bg-rose-50/50 rounded-2xl p-4 border border-rose-100/50 shadow-sm text-center">
           <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest block">Aktif</span>
@@ -142,12 +142,12 @@ export default function ProfileView({
 
       {/* User's Reports Section */}
       <div className="space-y-3">
-        <h3 className="text-base font-bold text-slate-800">Daftar Laporan Saya</h3>
+        <h3 className="text-base font-bold text-foreground">Daftar Laporan Saya</h3>
 
         {userReports.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-inner">
-            <p className="text-slate-400 text-sm">Anda belum pernah membuat laporan apa pun.</p>
-            <p className="text-xs text-slate-400 mt-1">Gunakan tombol (+) di beranda untuk memulai.</p>
+          <div className="bg-card rounded-3xl p-12 text-center border border-border shadow-inner">
+            <p className="text-muted-foreground text-sm">Anda belum pernah membuat laporan apa pun.</p>
+            <p className="text-xs text-muted-foreground mt-1">Gunakan tombol (+) di beranda untuk memulai.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -156,8 +156,8 @@ export default function ProfileView({
                 key={report.id_report}
                 layout
                 onClick={() => onReportClick(report)}
-                className={`p-4 bg-white hover:bg-slate-50 border rounded-2xl flex items-center justify-between gap-4 transition-all cursor-pointer ${
-                  report.status_selesai ? 'border-emerald-100 bg-emerald-50/5 opacity-80' : 'border-slate-100'
+                className={`p-4 bg-card hover:bg-accent border rounded-2xl flex items-center justify-between gap-4 transition-all cursor-pointer ${
+                  report.status_selesai ? 'border-emerald-100 bg-emerald-50/5 opacity-80' : 'border-border'
                 }`}
               >
                 <div className="flex items-center gap-4 overflow-hidden">
@@ -178,14 +178,14 @@ export default function ProfileView({
                       >
                         {report.tipe_laporan}
                       </span>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{report.kategori}</span>
+                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{report.kategori}</span>
                     </div>
-                    <h4 className={`text-sm font-bold text-slate-800 mt-0.5 truncate ${
-                      report.status_selesai ? 'line-through text-slate-400' : ''
+                    <h4 className={`text-sm font-bold text-foreground mt-0.5 truncate ${
+                      report.status_selesai ? 'line-through text-muted-foreground' : ''
                     }`}>
                       {report.judul}
                     </h4>
-                    <div className="flex items-center gap-3 text-[10px] text-slate-400 mt-1">
+                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-1">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3 h-3 shrink-0" />
                         <span className="truncate max-w-[120px]">{report.lokasi}</span>
@@ -202,7 +202,7 @@ export default function ProfileView({
                       id={`btn-profile-resolve-${report.id_report}`}
                       type="button"
                       onClick={(e) => handleResolveClick(e, report)}
-                      className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl transition-all"
+                      className="p-2 bg-muted hover:bg-secondary text-foreground rounded-xl transition-all"
                       title="Tandai Selesai"
                     >
                       <CheckCircle2 className="w-4 h-4" />
@@ -217,7 +217,7 @@ export default function ProfileView({
                     id={`btn-profile-delete-${report.id_report}`}
                     type="button"
                     onClick={(e) => handleDeleteClick(e, report)}
-                    className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-xl transition-all"
+                    className="p-2 hover:bg-rose-50 text-muted-foreground hover:text-rose-600 rounded-xl transition-all"
                     title="Hapus Laporan"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -253,3 +253,4 @@ export default function ProfileView({
     </div>
   );
 }
+
