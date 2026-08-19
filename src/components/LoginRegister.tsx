@@ -129,9 +129,6 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             <img className="w-20" src={logo} alt="" />
           </div>
           <h2 className="text-2xl font-extrabold font-sans tracking-tight">KetemuIn</h2>
-          <p className="text-muted-foreground text-xs mt-1">
-            Lost & Found Digital Lingkungan Rukun Tetangga (RT/RW)
-          </p>
         </div>
       </div>
 
@@ -271,11 +268,6 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           </button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-border text-center">
-          <p className="text-xs text-muted-foreground leading-normal">
-            KetemuIn menjamin keaslian data warga dengan mengaitkan nomor WhatsApp untuk menghindari laporan fiktif atau spam demi kenyamanan bersama.
-          </p>
-        </div>
       </div>
     </div>
   );
