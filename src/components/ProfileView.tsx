@@ -127,7 +127,7 @@ export default function ProfileView({
       {/* Stats Section */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
-          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Total Pos</span>
+          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Total Post</span>
           <span className="text-2xl font-black text-foreground mt-1 block">{totalReports}</span>
         </div>
         <div className="bg-rose-50/50 rounded-2xl p-4 border border-rose-100/50 shadow-sm text-center">
@@ -202,7 +202,7 @@ export default function ProfileView({
                       id={`btn-profile-resolve-${report.id_report}`}
                       type="button"
                       onClick={(e) => handleResolveClick(e, report)}
-                      className="p-2 bg-muted hover:bg-secondary text-foreground rounded-xl transition-all"
+                      className="p-2 bg-muted hover:bg-emerald-50 text-foreground hover:text-emerald-600 rounded-xl transition-all"
                       title="Tandai Selesai"
                     >
                       <CheckCircle2 className="w-4 h-4" />
@@ -253,4 +253,3 @@ export default function ProfileView({
     </div>
   );
 }
-
