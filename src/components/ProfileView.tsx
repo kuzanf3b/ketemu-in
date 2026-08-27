@@ -6,6 +6,7 @@ import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import ConfirmModal from './ConfirmModal';
 
+
 interface ProfileViewProps {
   currentUser: User;
   reports: Report[];

@@ -1,6 +1,6 @@
-# Ketemu.in
+# KetemuIn
 
-Ketemu.in is a lost-and-found web application built with **React + TypeScript**, powered by **Firebase Authentication** and **Cloud Firestore**.
+KetemuIn is a lost-and-found web application built with **React + TypeScript**, powered by **Firebase Authentication** and **Cloud Firestore**.
 
 Users can publish reports for lost (`HILANG`) or found (`DITEMUKAN`) items, filter/search reports, and contact report owners.
 
