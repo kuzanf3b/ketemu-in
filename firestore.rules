@@ -77,8 +77,8 @@ service cloud.firestore {
 
     // Match reports
     match /reports/{reportId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
+      allow get: if true;
+      allow list: if true;
       
       allow create: if isSignedIn() 
                     && isValidId(reportId)

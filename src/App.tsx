@@ -5,6 +5,7 @@ import ReportCard from './components/ReportCard';
 import ReportDetail from './components/ReportDetail';
 import ReportForm from './components/ReportForm';
 import ProfileView from './components/ProfileView';
+import LandingPage from './components/LandingPage';
 import { Search, Plus, SlidersHorizontal, Info, Compass, UserRound, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, auth, handleFirestoreError, OperationType } from './lib/firebase';
@@ -19,6 +20,8 @@ export default function App() {
     const saved = localStorage.getItem('ketemuin_user');
     return saved ? JSON.parse(saved) : null;
   });
+
+  const [viewState, setViewState] = useState<'landing' | 'login'>('landing');
 
   const [currentTab, setCurrentTab] = useState<'home' | 'profile'>('home');
   const [reports, setReports] = useState<Report[]>([]);
@@ -92,7 +95,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (authInitialized && currentUser && auth.currentUser) {
+    if (authInitialized) {
       fetchReports();
     }
   }, [authInitialized, currentUser, searchQuery, selectedCategory, selectedTipe]);
@@ -151,8 +154,44 @@ export default function App() {
   }
 
   if (!currentUser) {
+    if (viewState === 'landing') {
+      return (
+        <>
+          <LandingPage
+            reports={reports}
+            loading={loading}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            selectedTipe={selectedTipe}
+            setSelectedTipe={setSelectedTipe}
+            onNavigateToLogin={() => setViewState('login')}
+            onReportClick={(report) => setSelectedReport(report)}
+          />
+          <AnimatePresence>
+            {selectedReport && (
+              <ReportDetail
+                report={selectedReport}
+                currentUser={currentUser}
+                onClose={() => setSelectedReport(null)}
+                onResolve={handleReportResolved}
+                onDelete={handleReportDeleted}
+              />
+            )}
+          </AnimatePresence>
+        </>
+      );
+    }
+
     return (
-      <div className="min-h-screen bg-accent flex flex-col justify-center items-center p-4">
+      <div className="min-h-screen bg-accent flex flex-col justify-center items-center p-4 relative">
+        <button
+          onClick={() => setViewState('landing')}
+          className="absolute top-4 left-4 px-4 py-2 bg-card hover:bg-muted text-foreground border border-border text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
+        >
+          ← Kembali ke Beranda
+        </button>
         <LoginRegister onLoginSuccess={handleLoginSuccess} />
       </div>
     );

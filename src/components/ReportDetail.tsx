@@ -231,7 +231,7 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
                 <Phone className="w-4 h-4" />
                 WhatsApp Dinonaktifkan
               </button>
-            ) : (
+            ) : currentUser ? (
               <a
                 id="btn-whatsapp-cta"
                 href={getWhatsAppLink()}
@@ -242,6 +242,18 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
                 <Phone className="w-4 h-4 fill-white" />
                 Hubungi via WhatsApp
               </a>
+            ) : (
+              <button
+                id="btn-whatsapp-login-prompt"
+                onClick={() => {
+                  onClose();
+                  alert('Silakan Masuk atau Daftar Akun terlebih dahulu untuk dapat menghubungi pelapor.');
+                }}
+                className="w-full md:w-auto px-6 py-3 bg-primary hover:bg-secondary text-primary-foreground font-bold rounded-xl text-sm shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Phone className="w-4 h-4" />
+                Masuk untuk Hubungi
+              </button>
             )}
           </div>
         </div>
