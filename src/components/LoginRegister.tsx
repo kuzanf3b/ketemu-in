@@ -117,10 +117,10 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
   };
 
   return (
-    <div id="login-container" className="w-full max-w-md mx-auto bg-card text-card-foreground rounded-[var(--radius)] shadow-md border border-border overflow-hidden">
+    <div id="login-container" className="w-full max-w-md mx-auto bg-card text-card-foreground rounded-[var(--radius)] shadow-lg border border-border overflow-hidden my-auto">
       {/* Brand Header */}
-      <div className="bg-primary text-primary-foreground p-6 text-center border-b border-border">
-        <h2 className="font-serif text-3xl font-semibold tracking-tight">KetemuIn</h2>
+      <div className="bg-primary text-primary-foreground p-5 sm:p-6 text-center border-b border-border">
+        <h2 className="font-serif text-2xl sm:text-3xl font-semibold tracking-tight">KetemuIn</h2>
         <p className="text-xs text-primary-foreground/80 mt-1">Layanan Lost & Found RW 04</p>
       </div>
 
@@ -133,7 +133,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             setIsLogin(true);
             setError('');
           }}
-          className={`flex-1 py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${
+          className={`flex-1 min-h-[44px] py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${
             isLogin
               ? 'text-foreground border-b-2 border-primary bg-card font-semibold'
               : 'text-muted-foreground hover:text-foreground'
@@ -148,7 +148,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             setIsLogin(false);
             setError('');
           }}
-          className={`flex-1 py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${
+          className={`flex-1 min-h-[44px] py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${
             !isLogin
               ? 'text-foreground border-b-2 border-primary bg-card font-semibold'
               : 'text-muted-foreground hover:text-foreground'
@@ -159,7 +159,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
       </div>
 
       {/* Form Content */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -6 }}
@@ -186,7 +186,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                   placeholder="Nama sesuai KTP/warga"
                   value={namaLengkap}
                   onChange={(e) => setNamaLengkap(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
+                  className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground min-h-[42px]"
                   required={!isLogin}
                 />
               </div>
@@ -207,7 +207,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                 placeholder="08xxxxxxxxxx"
                 value={noWhatsapp}
                 onChange={(e) => setNoWhatsapp(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
+                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground min-h-[42px]"
                 required
               />
             </div>
@@ -230,7 +230,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                 placeholder="Minimal 6 karakter"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-9 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
+                className="w-full pl-9 pr-9 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground min-h-[42px]"
                 required
               />
               <button
@@ -264,13 +264,13 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             id="btn-auth-submit"
             type="submit"
             disabled={loading}
-            className="w-full mt-4 bg-primary hover:opacity-90 text-primary-foreground font-semibold py-2.5 px-4 rounded-[var(--radius)] transition-opacity text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full mt-4 bg-primary hover:opacity-90 text-primary-foreground font-semibold min-h-[44px] py-2.5 px-4 rounded-[var(--radius)] transition-opacity text-xs sm:text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-xs"
           >
             {loading ? (
               <span>Memproses...</span>
             ) : (
               <>
-                {isLogin ? 'Masuk' : 'Daftar Akun'}
+                <span>{isLogin ? 'Masuk' : 'Daftar Akun'}</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}

@@ -1,101 +1,54 @@
 import React, { useState, useRef } from 'react';
-import { User, Category } from '../types';
-import { X, Calendar, MapPin, AlertCircle, Upload } from 'lucide-react';
+import { User, Category, TipeLaporan } from '../types';
+import { X, Upload, Camera, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { collection, doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 
 interface ReportFormProps {
   currentUser: User;
   onClose: () => void;
-  onSuccess: (newReport: any) => void;
+  onSuccess: () => void;
 }
 
 const CATEGORIES: Category[] = ['Elektronik', 'Kunci', 'Dompet', 'Hewan', 'Dokumen', 'Lainnya'];
 
-const CATEGORY_PRESETS: Record<Category, string[]> = {
-  Elektronik: [
-    'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1585060544812-6b45742d762f?auto=format&fit=crop&w=600&q=80',
-  ],
-  Kunci: [
-    'https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=600&q=80',
-  ],
-  Dompet: [
-    'https://images.unsplash.com/photo-1627124718515-47f9931b3e4a?auto=format&fit=crop&w=600&q=80',
-  ],
-  Hewan: [
-    'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80',
-  ],
-  Dokumen: [
-    'https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=600&q=80',
-  ],
-  Lainnya: [
-    'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=600&q=80',
-  ],
-};
-
 export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFormProps) {
-  const [tipeLaporan, setTipeLaporan] = useState<'HILANG' | 'DITEMUKAN'>('HILANG');
-  const [kategori, setKategori] = useState<Category>('Elektronik');
+  const [tipeLaporan, setTipeLaporan] = useState<TipeLaporan>('HILANG');
   const [judul, setJudul] = useState('');
   const [deskripsi, setDeskripsi] = useState('');
-  const [fotoUrl, setFotoUrl] = useState('');
+  const [kategori, setKategori] = useState<Category>('Elektronik');
   const [lokasi, setLokasi] = useState('');
-  const [tglKejadian, setTglKejadian] = useState(new Date().toISOString().split('T')[0]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
+  const [tglKejadian, setTglKejadian] = useState(() => new Date().toISOString().split('T')[0]);
   
+  // Image handling
+  const [fotoUrl, setFotoUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const activePresets = CATEGORY_PRESETS[kategori] || CATEGORY_PRESETS['Lainnya'];
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      processFile(e.target.files[0]);
-    }
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      processFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const processFile = (file: File) => {
-    setError('');
+  // Resize & compress image into base64 data URL
+  const handleImageUpload = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      setError('Format file harus berupa gambar (PNG, JPG, JPEG).');
+      setError('Harap unggah file gambar (JPG, PNG, WebP).');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Ukuran gambar maksimal 10MB.');
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Ukuran gambar maksimal 5MB.');
       return;
     }
+
+    setUploading(true);
+    setError('');
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 600;
-        const MAX_HEIGHT = 600;
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 1200;
         let width = img.width;
         let height = img.height;
 
@@ -114,92 +67,113 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.72);
-          setFotoUrl(compressedBase64);
-        }
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setFotoUrl(dataUrl);
+        setUploading(false);
       };
-      img.src = event.target?.result as string;
+      img.src = e.target?.result as string;
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleImageUpload(e.target.files[0]);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleImageUpload(e.dataTransfer.files[0]);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
-    if (!judul.trim() || !deskripsi.trim() || !lokasi.trim() || !tglKejadian) {
-      setError('Harap lengkapi semua kolom.');
-      setLoading(false);
+    if (!judul.trim()) {
+      setError('Nama atau judul barang wajib diisi.');
+      return;
+    }
+    if (!deskripsi.trim()) {
+      setError('Deskripsi atau ciri-ciri barang wajib diisi.');
+      return;
+    }
+    if (!lokasi.trim()) {
+      setError('Lokasi kejadian wajib diisi.');
       return;
     }
 
-    const finalFotoUrl = fotoUrl.trim() || activePresets[0];
+    setUploading(true);
 
     try {
-      const reportsCollection = collection(db, 'reports');
-      const newDocRef = doc(reportsCollection);
-      const generatedId = newDocRef.id;
+      const fallbackPlaceholder = tipeLaporan === 'HILANG'
+        ? 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=800&auto=format&fit=crop&q=80'
+        : 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&auto=format&fit=crop&q=80';
 
-      const payload = {
-        id_report: generatedId,
+      const finalFotoUrl = fotoUrl || fallbackPlaceholder;
+
+      const newReportData = {
         id_user: currentUser.id_user,
-        tipe_laporan: tipeLaporan,
-        kategori,
-        judul: judul.trim(),
-        deskripsi: deskripsi.trim(),
-        foto_url: finalFotoUrl,
-        lokasi: lokasi.trim(),
-        tgl_kejadian: tglKejadian,
-        status_selesai: false,
-        created_at: new Date().toISOString(),
         user_nama: currentUser.nama_lengkap,
         user_whatsapp: currentUser.no_whatsapp,
-        status_disetujui: false
+        tipe_laporan: tipeLaporan,
+        judul: judul.trim(),
+        deskripsi: deskripsi.trim(),
+        kategori,
+        lokasi: lokasi.trim(),
+        tgl_kejadian: tglKejadian,
+        foto_url: finalFotoUrl,
+        status_selesai: false,
+        status_disetujui: currentUser.is_admin ? true : false,
+        created_at: new Date().toISOString()
       };
 
       try {
-        await setDoc(newDocRef, payload);
+        await addDoc(collection(db, 'reports'), newReportData);
       } catch (fsErr) {
-        handleFirestoreError(fsErr, OperationType.CREATE, `reports/${generatedId}`);
+        handleFirestoreError(fsErr, OperationType.CREATE, 'reports');
       }
 
-      onSuccess(payload);
+      onSuccess();
     } catch (err: any) {
-      setError(err.message);
+      console.error('Error creating report:', err);
+      setError(err.message || 'Gagal menyimpan laporan. Silakan coba lagi.');
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/45 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-foreground/50 backdrop-blur-xs overflow-y-auto">
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.96 }}
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.98 }}
         transition={{ duration: 0.15 }}
-        className="relative bg-card text-card-foreground w-full max-w-lg rounded-[var(--radius)] overflow-hidden shadow-lg border border-border max-h-[90vh] flex flex-col"
+        className="relative bg-card text-card-foreground w-full max-w-lg rounded-t-[1rem] sm:rounded-[var(--radius)] overflow-hidden shadow-2xl border border-border max-h-[92vh] sm:max-h-[90vh] flex flex-col"
       >
         {/* Header */}
-        <div className="px-5 py-4 border-b border-border flex items-center justify-between bg-card">
+        <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-border flex items-center justify-between bg-card shrink-0">
           <div>
-            <h2 className="font-serif text-xl font-semibold text-foreground">Buat Laporan Baru</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Informasi barang hilang atau temuan di RW 04</p>
+            <h2 className="font-serif text-lg sm:text-xl font-semibold text-foreground">Buat Laporan Baru</h2>
+            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">Informasi barang hilang atau temuan di RW 04</p>
           </div>
           <button
             onClick={onClose}
             aria-label="Tutup form"
-            className="p-1.5 text-muted-foreground hover:text-foreground rounded-[var(--radius)] hover:bg-muted transition-colors cursor-pointer"
+            className="p-2 text-muted-foreground hover:text-foreground rounded-full sm:rounded-[var(--radius)] hover:bg-muted transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
           {error && (
             <div className="p-3 text-xs font-medium text-destructive-foreground bg-destructive/90 rounded-[var(--radius)] flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -210,12 +184,12 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
           {/* Tipe Laporan Toggle */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground block">Tipe Laporan</label>
-            <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-[var(--radius)] border border-border">
+            <div className="grid grid-cols-2 gap-1.5 bg-muted p-1 rounded-[var(--radius)] border border-border">
               <button
                 type="button"
                 id="btn-toggle-hilang"
                 onClick={() => setTipeLaporan('HILANG')}
-                className={`py-2 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${
+                className={`min-h-[40px] py-2 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${
                   tipeLaporan === 'HILANG'
                     ? 'bg-[var(--chart-1)] text-white shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
@@ -227,181 +201,186 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
                 type="button"
                 id="btn-toggle-ditemukan"
                 onClick={() => setTipeLaporan('DITEMUKAN')}
-                className={`py-2 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${
+                className={`min-h-[40px] py-2 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${
                   tipeLaporan === 'DITEMUKAN'
                     ? 'bg-primary text-primary-foreground shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                DITEMUKAN / PENEMUAN
+                DITEMUKAN / TEMUAN
               </button>
             </div>
           </div>
 
-          {/* Kategori Selector */}
+          {/* Image Upload Area */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground block">Kategori Barang</label>
-            <div className="grid grid-cols-3 gap-2">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => {
-                    setKategori(cat);
-                    if (!fotoUrl.startsWith('data:image/')) {
-                      setFotoUrl('');
-                    }
-                  }}
-                  className={`py-1.5 px-2 text-center text-xs rounded-[var(--radius)] border transition-colors cursor-pointer ${
-                    kategori === cat
-                      ? 'border-primary bg-primary text-primary-foreground font-semibold'
-                      : 'border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Judul Laporan */}
-          <div className="space-y-1.5">
-            <label htmlFor="form-report-title" className="text-xs font-semibold text-foreground block">
-              Nama Barang / Judul Laporan
+            <label className="text-xs font-semibold text-foreground block">
+              Foto Barang <span className="text-muted-foreground font-normal">(Opsional)</span>
             </label>
-            <input
-              id="form-report-title"
-              type="text"
-              placeholder="Misal: Dompet Kulit Cokelat, Kunci Motor Honda"
-              maxLength={150}
-              value={judul}
-              onChange={(e) => setJudul(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
-              required
-            />
-          </div>
-
-          {/* Deskripsi */}
-          <div className="space-y-1.5">
-            <label htmlFor="form-report-desc" className="text-xs font-semibold text-foreground block">
-              Deskripsi & Ciri Khusus
-            </label>
-            <textarea
-              id="form-report-desc"
-              rows={3}
-              placeholder="Jelaskan warna, tanda khusus, merk, atau isi barang secara jelas."
-              value={deskripsi}
-              onChange={(e) => setDeskripsi(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground resize-none"
-              required
-            />
-          </div>
-
-          {/* Lokasi Kejadian */}
-          <div className="space-y-1.5">
-            <label htmlFor="form-report-loc" className="text-xs font-semibold text-foreground block">
-              Perkiraan Lokasi di Lingkungan RW 04
-            </label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
-                <MapPin className="w-4 h-4" />
-              </span>
-              <input
-                id="form-report-loc"
-                type="text"
-                placeholder="Misal: Depan Pos Ronda RT 03, Lapangan RW"
-                value={lokasi}
-                onChange={(e) => setLokasi(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Tanggal Kejadian */}
-          <div className="space-y-1.5">
-            <label htmlFor="form-report-date" className="text-xs font-semibold text-foreground block">
-              Tanggal Kejadian
-            </label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
-                <Calendar className="w-4 h-4" />
-              </span>
-              <input
-                id="form-report-date"
-                type="date"
-                value={tglKejadian}
-                onChange={(e) => setTglKejadian(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Foto Upload */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground block">Foto Barang</label>
             
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+
             {fotoUrl ? (
-              <div className="relative rounded-[var(--radius)] border border-border overflow-hidden bg-muted aspect-video flex items-center justify-center">
-                <img src={fotoUrl} alt="Preview" className="w-full h-full object-cover" />
+              <div className="relative h-44 sm:h-48 w-full rounded-[var(--radius)] overflow-hidden border border-border bg-muted">
+                <img
+                  src={fotoUrl}
+                  alt="Preview"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
                 <button
                   type="button"
                   onClick={() => setFotoUrl('')}
-                  className="absolute top-2 right-2 p-1.5 bg-background/80 hover:bg-destructive hover:text-white text-foreground rounded-[var(--radius)] border border-border transition-colors cursor-pointer"
-                  title="Hapus foto"
+                  className="absolute top-2 right-2 p-1.5 bg-card/90 text-foreground border border-border rounded-full hover:bg-card transition-colors cursor-pointer shadow-xs"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             ) : (
               <div
-                onDragEnter={handleDrag}
-                onDragOver={handleDrag}
-                onDragLeave={handleDrag}
+                onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border border-dashed rounded-[var(--radius)] p-5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors ${
-                  dragActive
-                    ? 'border-primary bg-accent'
-                    : 'border-border bg-accent/40 hover:bg-accent'
-                }`}
+                className="border-2 border-dashed border-border rounded-[var(--radius)] p-5 text-center cursor-pointer hover:border-foreground/40 hover:bg-muted/30 transition-colors flex flex-col items-center justify-center gap-1.5"
               >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <Upload className="w-5 h-5 text-muted-foreground" />
-                <div className="text-center space-y-0.5">
-                  <p className="text-xs font-medium text-foreground">Klik untuk memilih foto atau seret file ke sini</p>
-                  <p className="text-[11px] text-muted-foreground">PNG, JPG (Maks. 10MB). Jika kosong, sistem menggunakan foto standar.</p>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                  <Camera className="w-5 h-5" />
                 </div>
+                <p className="text-xs font-medium text-foreground">
+                  Ketuk untuk ambil foto / pilih dari galeri
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  Mendukung JPG, PNG (Maks. 5MB)
+                </p>
               </div>
             )}
           </div>
-        </form>
 
-        {/* Footer Actions */}
-        <div className="px-5 py-3.5 border-t border-border bg-card flex gap-2.5 justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-foreground hover:bg-muted border border-border rounded-[var(--radius)] transition-colors cursor-pointer"
-          >
-            Batal
-          </button>
-          <button
-            id="btn-submit-report"
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-5 py-2 text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-[var(--radius)] transition-opacity disabled:opacity-50 cursor-pointer"
-          >
-            {loading ? 'Menyimpan...' : 'Kirim Laporan'}
-          </button>
-        </div>
+          {/* Judul Barang */}
+          <div className="space-y-1.5">
+            <label htmlFor="form-input-judul" className="text-xs font-semibold text-foreground block">
+              Nama Barang <span className="text-[var(--chart-1)]">*</span>
+            </label>
+            <input
+              id="form-input-judul"
+              type="text"
+              required
+              placeholder="Contoh: Dompet Kulit Cokelat, Kunci Motor Vario"
+              value={judul}
+              onChange={(e) => setJudul(e.target.value)}
+              className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
+            />
+          </div>
+
+          {/* Kategori & Tanggal (Responsive grid) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label htmlFor="form-select-kategori" className="text-xs font-semibold text-foreground block">
+                Kategori <span className="text-[var(--chart-1)]">*</span>
+              </label>
+              <select
+                id="form-select-kategori"
+                value={kategori}
+                onChange={(e) => setKategori(e.target.value as Category)}
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="form-input-tanggal" className="text-xs font-semibold text-foreground block">
+                Tanggal Kejadian <span className="text-[var(--chart-1)]">*</span>
+              </label>
+              <input
+                id="form-input-tanggal"
+                type="date"
+                required
+                value={tglKejadian}
+                onChange={(e) => setTglKejadian(e.target.value)}
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
+              />
+            </div>
+          </div>
+
+          {/* Lokasi */}
+          <div className="space-y-1.5">
+            <label htmlFor="form-input-lokasi" className="text-xs font-semibold text-foreground block">
+              Perkiraan Lokasi <span className="text-[var(--chart-1)]">*</span>
+            </label>
+            <input
+              id="form-input-lokasi"
+              type="text"
+              required
+              placeholder="Contoh: Lapangan Voli RT 02, Pos Ronda RT 04"
+              value={lokasi}
+              onChange={(e) => setLokasi(e.target.value)}
+              className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
+            />
+          </div>
+
+          {/* Deskripsi */}
+          <div className="space-y-1.5">
+            <label htmlFor="form-input-deskripsi" className="text-xs font-semibold text-foreground block">
+              Deskripsi & Ciri Khusus <span className="text-[var(--chart-1)]">*</span>
+            </label>
+            <textarea
+              id="form-input-deskripsi"
+              rows={3}
+              required
+              placeholder="Jelaskan warna, tanda pengenal, kondisi fisik, atau ciri khas barang tersebut..."
+              value={deskripsi}
+              onChange={(e) => setDeskripsi(e.target.value)}
+              className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground resize-none"
+            />
+          </div>
+
+          {/* User Contact Preview */}
+          <div className="p-3 bg-muted/60 rounded-[var(--radius)] border border-border space-y-1">
+            <div className="text-[11px] text-muted-foreground">Kontak Pelapor (Otomatis):</div>
+            <div className="text-xs font-medium text-foreground flex items-center justify-between">
+              <span>{currentUser.nama_lengkap}</span>
+              <span className="font-mono text-muted-foreground">{currentUser.no_whatsapp}</span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="pt-2 flex items-center justify-end gap-2.5">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 sm:flex-initial min-h-[42px] px-4 py-2 text-xs font-medium text-foreground hover:bg-muted rounded-[var(--radius)] border border-border transition-colors cursor-pointer"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              id="btn-submit-report"
+              disabled={uploading}
+              className="flex-1 sm:flex-initial min-h-[42px] px-5 py-2 text-xs font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-[var(--radius)] transition-opacity disabled:opacity-50 cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
+            >
+              {uploading ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
+                  <span>Menyimpan...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Kirim Laporan</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </motion.div>
     </div>
   );

@@ -100,25 +100,25 @@ export default function ProfileView({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Profile Header Card */}
-      <div id="profile-card" className="bg-card text-card-foreground rounded-[var(--radius)] p-5 md:p-6 border border-border shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex items-center gap-4">
+      <div id="profile-card" className="bg-card text-card-foreground rounded-[var(--radius)] p-4 sm:p-6 border border-border shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-3.5 sm:gap-4">
           {/* Avatar with serif initials */}
-          <div className="w-14 h-14 rounded-full bg-muted text-foreground flex items-center justify-center font-serif text-xl font-bold border border-border shrink-0">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-muted text-foreground flex items-center justify-center font-serif text-lg sm:text-xl font-bold border border-border shrink-0">
             {getInitials(currentUser.nama_lengkap)}
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-serif text-xl font-semibold text-foreground">{currentUser.nama_lengkap}</h2>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <h2 className="font-serif text-lg sm:text-xl font-semibold text-foreground leading-tight">{currentUser.nama_lengkap}</h2>
               {currentUser.is_admin && (
-                <span className="bg-secondary text-secondary-foreground text-[11px] font-semibold px-2 py-0.5 rounded-full border border-border">
+                <span className="bg-secondary text-secondary-foreground text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full border border-border">
                   Petugas RW 04
                 </span>
               )}
             </div>
             <div className="flex items-center gap-1.5 text-muted-foreground text-xs mt-1">
-              <Phone className="w-3.5 h-3.5 text-muted-foreground" />
+              <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
               <span>+{currentUser.no_whatsapp}</span>
             </div>
           </div>
@@ -127,35 +127,35 @@ export default function ProfileView({
         <button
           id="btn-logout"
           onClick={onLogout}
-          className="px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/30 rounded-[var(--radius)] transition-colors flex items-center gap-1.5 shrink-0 self-stretch md:self-auto justify-center cursor-pointer"
+          className="min-h-[40px] px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/30 rounded-[var(--radius)] transition-colors flex items-center justify-center gap-1.5 w-full sm:w-auto cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
           Keluar
         </button>
       </div>
 
-      {/* Stats Section */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-card rounded-[var(--radius)] p-4 border border-border text-center">
-          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">Total Laporan</span>
-          <span className="font-serif text-2xl font-bold text-foreground mt-0.5 block">{totalReports}</span>
+      {/* Stats Section (Responsive grid) */}
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+        <div className="bg-card rounded-[var(--radius)] p-3 sm:p-4 border border-border text-center">
+          <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground uppercase tracking-wider block truncate">Total Laporan</span>
+          <span className="font-serif text-xl sm:text-2xl font-bold text-foreground mt-0.5 block">{totalReports}</span>
         </div>
-        <div className="bg-card rounded-[var(--radius)] p-4 border border-border text-center">
-          <span className="text-[11px] font-medium text-[var(--chart-1)] uppercase tracking-wider block">Masih Aktif</span>
-          <span className="font-serif text-2xl font-bold text-[var(--chart-1)] mt-0.5 block">{activeReports}</span>
+        <div className="bg-card rounded-[var(--radius)] p-3 sm:p-4 border border-border text-center">
+          <span className="text-[10px] sm:text-[11px] font-medium text-[var(--chart-1)] uppercase tracking-wider block truncate">Masih Aktif</span>
+          <span className="font-serif text-xl sm:text-2xl font-bold text-[var(--chart-1)] mt-0.5 block">{activeReports}</span>
         </div>
-        <div className="bg-card rounded-[var(--radius)] p-4 border border-border text-center">
-          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">Selesai</span>
-          <span className="font-serif text-2xl font-bold text-foreground mt-0.5 block">{resolvedReports}</span>
+        <div className="bg-card rounded-[var(--radius)] p-3 sm:p-4 border border-border text-center">
+          <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground uppercase tracking-wider block truncate">Selesai</span>
+          <span className="font-serif text-xl sm:text-2xl font-bold text-foreground mt-0.5 block">{resolvedReports}</span>
         </div>
       </div>
 
       {/* User's Reports Section */}
       <div className="space-y-3">
-        <h3 className="font-sans text-base font-semibold text-foreground">Daftar Laporan Saya</h3>
+        <h3 className="font-sans text-sm sm:text-base font-semibold text-foreground">Daftar Laporan Saya</h3>
 
         {userReports.length === 0 ? (
-          <div className="bg-card rounded-[var(--radius)] p-10 text-center border border-border">
+          <div className="bg-card rounded-[var(--radius)] p-8 sm:p-10 text-center border border-border">
             <p className="text-foreground text-sm font-medium">Belum ada laporan yang Anda buat.</p>
             <p className="text-xs text-muted-foreground mt-1">Gunakan tombol Buat Laporan untuk memposting barang hilang atau temuan.</p>
           </div>
@@ -166,16 +166,16 @@ export default function ProfileView({
                 key={report.id_report}
                 layout
                 onClick={() => onReportClick(report)}
-                className={`p-3.5 bg-card hover:bg-accent border border-border rounded-[var(--radius)] flex items-center justify-between gap-4 transition-colors cursor-pointer shadow-xs ${
+                className={`p-3 sm:p-3.5 bg-card hover:bg-accent border border-border rounded-[var(--radius)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-colors cursor-pointer shadow-xs ${
                   report.status_selesai ? 'opacity-85' : ''
                 }`}
               >
-                <div className="flex items-center gap-3.5 overflow-hidden">
+                <div className="flex items-center gap-3 overflow-hidden">
                   <img
                     src={report.foto_url}
                     alt={report.judul}
                     referrerPolicy="no-referrer"
-                    className="w-14 h-14 rounded-[var(--radius)] object-cover shrink-0 border border-border"
+                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-[var(--radius)] object-cover shrink-0 border border-border"
                   />
                   <div className="overflow-hidden space-y-1">
                     <div className="flex items-center gap-1.5">
@@ -189,19 +189,19 @@ export default function ProfileView({
                         {report.tipe_laporan}
                       </span>
                       <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                        <Tag className="w-3 h-3 text-muted-foreground" />
-                        {report.kategori}
+                        <Tag className="w-3 h-3 text-muted-foreground shrink-0" />
+                        <span className="truncate">{report.kategori}</span>
                       </span>
                     </div>
-                    <h4 className={`text-sm font-semibold text-foreground truncate ${
+                    <h4 className={`text-xs sm:text-sm font-semibold text-foreground truncate ${
                       report.status_selesai ? 'line-through text-muted-foreground' : ''
                     }`}>
                       {report.judul}
                     </h4>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3 h-3 shrink-0" />
-                        <span className="truncate max-w-[140px]">{report.lokasi}</span>
+                        <span className="truncate max-w-[120px] sm:max-w-[140px]">{report.lokasi}</span>
                       </span>
                       <span>·</span>
                       <span className="flex items-center gap-1">
@@ -212,17 +212,17 @@ export default function ProfileView({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border">
                   {!report.status_selesai ? (
                     <button
                       id={`btn-profile-resolve-${report.id_report}`}
                       type="button"
                       onClick={(e) => handleResolveClick(e, report)}
-                      className="px-2.5 py-1.5 bg-secondary hover:bg-muted text-secondary-foreground text-xs font-medium rounded-[var(--radius)] border border-border transition-colors flex items-center gap-1 cursor-pointer"
+                      className="min-h-[34px] px-3 py-1 bg-secondary hover:bg-muted text-secondary-foreground text-xs font-medium rounded-[var(--radius)] border border-border transition-colors flex items-center gap-1 cursor-pointer"
                       title="Tandai Selesai"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Selesai</span>
+                      <span>Selesai</span>
                     </button>
                   ) : (
                     <span className="bg-[var(--chart-5)] text-foreground text-xs font-medium px-2.5 py-1 rounded-full border border-border flex items-center gap-1">
@@ -234,7 +234,7 @@ export default function ProfileView({
                     id={`btn-profile-delete-${report.id_report}`}
                     type="button"
                     onClick={(e) => handleDeleteClick(e, report)}
-                    className="p-1.5 hover:bg-destructive/10 text-muted-foreground hover:text-destructive border border-transparent hover:border-destructive/20 rounded-[var(--radius)] transition-colors cursor-pointer"
+                    className="min-h-[34px] min-w-[34px] p-1.5 hover:bg-destructive/10 text-muted-foreground hover:text-destructive border border-transparent hover:border-destructive/20 rounded-[var(--radius)] transition-colors cursor-pointer flex items-center justify-center"
                     title="Hapus Laporan"
                   >
                     <Trash2 className="w-4 h-4" />

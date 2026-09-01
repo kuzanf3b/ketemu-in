@@ -7,7 +7,7 @@ import ReportForm from './components/ReportForm';
 import ProfileView from './components/ProfileView';
 import LandingPage from './components/LandingPage';
 import ThemeToggle from './components/ThemeToggle';
-import { Search, Plus, SlidersHorizontal, Compass, UserRound, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Search, Plus, SlidersHorizontal, Compass, UserRound, CheckCircle2, ArrowLeft, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, auth, handleFirestoreError, OperationType } from './lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
@@ -60,6 +60,14 @@ export default function App() {
   // Modals state
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const hasActiveFilters = searchQuery !== '' || selectedCategory !== 'Semua' || selectedTipe !== 'Semua';
+
+  const resetFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('Semua');
+    setSelectedTipe('Semua');
+  };
 
   // Sync with Firebase auth state
   useEffect(() => {
@@ -216,17 +224,15 @@ export default function App() {
     }
 
     return (
-      <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 relative">
-        <div className="absolute top-4 left-4 flex items-center gap-2">
+      <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 relative antialiased">
+        <div className="w-full max-w-md flex justify-between items-center mb-4">
           <button
             onClick={() => setViewState('landing')}
-            className="px-3.5 py-1.5 bg-card hover:bg-muted text-foreground border border-border text-xs font-medium rounded-[var(--radius)] flex items-center gap-1.5 cursor-pointer shadow-xs"
+            className="min-h-[38px] px-3 py-1.5 bg-card hover:bg-muted text-foreground border border-border text-xs font-medium rounded-[var(--radius)] flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Kembali ke Beranda
+            Beranda
           </button>
-        </div>
-        <div className="absolute top-4 right-4">
           <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
         </div>
         <LoginRegister onLoginSuccess={handleLoginSuccess} />
@@ -235,51 +241,51 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased">
 
       {/* Top Navbar Header */}
-      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xs border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img className="w-9 h-9 object-contain dark:invert" src={logoBlack} alt="KetemuIn Logo" referrerPolicy="no-referrer" />
+      <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border transition-colors">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex justify-between items-center">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <img className="w-8 h-8 sm:w-9 sm:h-9 object-contain dark:invert" src={logoBlack} alt="KetemuIn Logo" referrerPolicy="no-referrer" />
             <div>
-              <h1 className="font-serif text-xl font-semibold tracking-tight text-foreground leading-none">
+              <h1 className="font-serif text-lg sm:text-xl font-semibold tracking-tight text-foreground leading-none">
                 KetemuIn
               </h1>
-              <span className="text-[11px] text-muted-foreground font-medium">Lost & Found RW 04</span>
+              <span className="text-[10px] sm:text-[11px] text-muted-foreground font-medium block">Lost & Found RW 04</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
 
-            {/* Navigation Tabs */}
-            <div className="flex bg-muted p-1 rounded-[var(--radius)] border border-border">
+            {/* Desktop / Tablet Navigation Tabs */}
+            <div className="hidden sm:flex bg-muted p-1 rounded-[var(--radius)] border border-border">
               <button
                 id="nav-btn-home"
                 onClick={() => setCurrentTab('home')}
-                className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+                className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
                   currentTab === 'home'
                     ? 'bg-card text-foreground font-semibold shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Compass className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Beranda</span>
+                <span>Beranda</span>
               </button>
 
               {currentUser?.is_admin && (
                 <button
                   id="nav-btn-approval"
                   onClick={() => setCurrentTab('approval')}
-                  className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
                     currentTab === 'approval'
                       ? 'bg-card text-foreground font-semibold shadow-xs'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Persetujuan</span>
+                  <span>Persetujuan</span>
                   {pendingReports.length > 0 && (
                     <span className="bg-[var(--chart-1)] text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">
                       {pendingReports.length}
@@ -291,21 +297,21 @@ export default function App() {
               <button
                 id="nav-btn-profile"
                 onClick={() => setCurrentTab('profile')}
-                className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+                className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
                   currentTab === 'profile'
                     ? 'bg-card text-foreground font-semibold shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <UserRound className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Profil</span>
+                <span>Profil</span>
               </button>
             </div>
 
             <button
               id="btn-header-add"
               onClick={() => setShowAddModal(true)}
-              className="hidden md:flex px-3.5 py-1.5 rounded-[var(--radius)] bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity items-center gap-1.5 cursor-pointer shadow-xs"
+              className="hidden sm:flex min-h-[36px] px-3.5 py-1.5 rounded-[var(--radius)] bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
               Lapor Barang
@@ -315,13 +321,13 @@ export default function App() {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 pb-24">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 pb-28 sm:pb-20">
         {currentTab === 'approval' && currentUser?.is_admin ? (
-          <div className="space-y-5">
-            <div className="bg-card border border-border rounded-[var(--radius)] p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-4 sm:space-y-5">
+            <div className="bg-card border border-border rounded-[var(--radius)] p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
               <div className="space-y-1">
-                <h3 className="font-serif text-lg font-semibold text-foreground flex items-center gap-2">
-                  <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+                <h3 className="font-serif text-base sm:text-lg font-semibold text-foreground flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-muted-foreground shrink-0" />
                   Persetujuan Laporan Petugas
                 </h3>
                 <p className="text-xs text-muted-foreground max-w-xl leading-relaxed">
@@ -334,7 +340,7 @@ export default function App() {
             </div>
 
             {pendingReports.length === 0 ? (
-              <div className="bg-card rounded-[var(--radius)] p-12 text-center border border-border max-w-md mx-auto">
+              <div className="bg-card rounded-[var(--radius)] p-8 sm:p-12 text-center border border-border max-w-md mx-auto">
                 <CheckCircle2 className="w-8 h-8 text-foreground mx-auto mb-2" />
                 <h4 className="font-sans text-sm font-semibold text-foreground">Tidak Ada Antrean</h4>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -344,7 +350,7 @@ export default function App() {
             ) : (
               <motion.div
                 layout
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4"
               >
                 {pendingReports.map((report) => (
                   <ReportCard
@@ -357,12 +363,12 @@ export default function App() {
             )}
           </div>
         ) : currentTab === 'home' ? (
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
 
             {/* Header Greeting */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div>
-                <h2 className="font-serif text-2xl font-semibold text-foreground tracking-tight">
+                <h2 className="font-serif text-xl sm:text-2xl font-semibold text-foreground tracking-tight">
                   Halo, {currentUser.nama_lengkap}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -372,7 +378,7 @@ export default function App() {
               
               <button
                 onClick={() => setShowAddModal(true)}
-                className="sm:hidden w-full py-2.5 px-4 rounded-[var(--radius)] bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                className="sm:hidden w-full min-h-[42px] py-2.5 px-4 rounded-[var(--radius)] bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Plus className="w-4 h-4" />
                 Buat Laporan Baru
@@ -380,8 +386,8 @@ export default function App() {
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="bg-card rounded-[var(--radius)] p-4 border border-border space-y-3 shadow-xs">
-              <div className="flex flex-col md:flex-row gap-2.5">
+            <div className="bg-card rounded-[var(--radius)] p-3.5 sm:p-4 border border-border space-y-3 shadow-xs">
+              <div className="flex flex-col sm:flex-row gap-2.5">
                 <div className="relative flex-1">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
                     <Search className="w-4 h-4" />
@@ -389,21 +395,30 @@ export default function App() {
                   <input
                     id="search-input"
                     type="text"
-                    placeholder="Cari berdasarkan nama barang, lokasi, atau kata kunci..."
+                    placeholder="Cari nama barang, lokasi, atau kata kunci..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
+                    className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground min-h-[42px]"
                   />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
 
                 {/* Status Toggle */}
-                <div className="flex gap-1 bg-muted p-1 rounded-[var(--radius)] border border-border shrink-0">
+                <div className="grid grid-cols-3 sm:flex gap-1 bg-muted p-1 rounded-[var(--radius)] border border-border shrink-0">
                   {['Semua', 'HILANG', 'DITEMUKAN'].map((tipe) => (
                     <button
                       key={tipe}
                       id={`status-filter-${tipe}`}
                       onClick={() => setSelectedTipe(tipe)}
-                      className={`px-3 py-1 text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${
+                      className={`min-h-[34px] px-2 sm:px-3 py-1 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer whitespace-nowrap ${
                         selectedTipe === tipe
                           ? tipe === 'HILANG'
                             ? 'bg-[var(--chart-1)] text-white shadow-xs'
@@ -411,29 +426,38 @@ export default function App() {
                           : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      {tipe === 'HILANG' ? 'Kehilangan' : tipe === 'DITEMUKAN' ? 'Penemuan' : 'Semua'}
+                      {tipe === 'HILANG' ? 'Hilang' : tipe === 'DITEMUKAN' ? 'Temuan' : 'Semua'}
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Category Chips */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1">
-                <span className="text-xs font-medium text-muted-foreground shrink-0 mr-1">Kategori:</span>
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 no-scrollbar scroll-smooth">
+                <span className="text-xs font-medium text-muted-foreground shrink-0 mr-1 hidden sm:inline">Kategori:</span>
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat}
                     id={`category-filter-${cat}`}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-2.5 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 transition-colors cursor-pointer border ${
+                    className={`min-h-[32px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 transition-colors cursor-pointer border whitespace-nowrap ${
                       selectedCategory === cat
                         ? 'border-primary bg-primary text-primary-foreground font-semibold'
-                        : 'border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted'
+                        : 'border-border bg-background sm:bg-card text-muted-foreground hover:text-foreground hover:bg-muted'
                     }`}
                   >
                     {cat}
                   </button>
                 ))}
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetFilters}
+                    className="min-h-[32px] px-2.5 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 text-destructive hover:bg-destructive/10 border border-destructive/20 transition-colors cursor-pointer whitespace-nowrap"
+                  >
+                    Reset Filter
+                  </button>
+                )}
               </div>
             </div>
 
@@ -444,27 +468,25 @@ export default function App() {
                 <p className="text-muted-foreground text-xs">Memuat daftar laporan...</p>
               </div>
             ) : visibleHomeReports.length === 0 ? (
-              <div className="bg-card rounded-[var(--radius)] p-12 text-center border border-border max-w-md mx-auto">
+              <div className="bg-card rounded-[var(--radius)] p-8 sm:p-12 text-center border border-border max-w-md mx-auto">
                 <SlidersHorizontal className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
                 <h4 className="font-sans text-sm font-semibold text-foreground">Tidak Ada Laporan</h4>
                 <p className="text-xs text-muted-foreground mt-1">
                   Tidak ditemukan laporan yang sesuai dengan kriteria pencarian Anda.
                 </p>
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('Semua');
-                    setSelectedTipe('Semua');
-                  }}
-                  className="mt-3 text-xs text-foreground hover:underline font-medium cursor-pointer"
-                >
-                  Reset Filter
-                </button>
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetFilters}
+                    className="mt-3 text-xs text-foreground hover:underline font-medium cursor-pointer"
+                  >
+                    Reset Semua Filter
+                  </button>
+                )}
               </div>
             ) : (
               <motion.div
                 layout
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4"
               >
                 {visibleHomeReports.map((report) => (
                   <ReportCard
@@ -489,20 +511,65 @@ export default function App() {
         )}
       </main>
 
-      {/* Floating Action Button (FAB) for Mobile */}
+      {/* Floating Action Button (FAB) for Mobile when on home tab */}
       {currentTab === 'home' && (
         <button
           id="btn-fab-add"
           onClick={() => setShowAddModal(true)}
-          className="md:hidden fixed bottom-6 right-6 z-40 w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity cursor-pointer"
+          className="sm:hidden fixed bottom-20 right-5 z-40 w-13 h-13 min-h-[52px] min-w-[52px] bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-xl hover:opacity-90 transition-transform active:scale-95 cursor-pointer"
           title="Buat Laporan Baru"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-6 h-6" />
         </button>
       )}
 
-      {/* Footer */}
-      <footer className="bg-card border-t border-border py-5 text-center text-xs text-muted-foreground">
+      {/* Mobile Bottom Navigation Bar (< 640px viewport) */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border px-3 py-2 flex justify-around items-center">
+        <button
+          id="mobile-nav-btn-home"
+          onClick={() => setCurrentTab('home')}
+          className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
+            currentTab === 'home' ? 'text-foreground font-semibold' : 'text-muted-foreground'
+          }`}
+        >
+          <Compass className="w-5 h-5 mb-0.5" />
+          <span className="text-[10px]">Beranda</span>
+        </button>
+
+        {currentUser?.is_admin && (
+          <button
+            id="mobile-nav-btn-approval"
+            onClick={() => setCurrentTab('approval')}
+            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer relative ${
+              currentTab === 'approval' ? 'text-foreground font-semibold' : 'text-muted-foreground'
+            }`}
+          >
+            <div className="relative">
+              <SlidersHorizontal className="w-5 h-5 mb-0.5" />
+              {pendingReports.length > 0 && (
+                <span className="absolute -top-1 -right-2 bg-[var(--chart-1)] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  {pendingReports.length}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px]">Persetujuan</span>
+          </button>
+        )}
+
+        <button
+          id="mobile-nav-btn-profile"
+          onClick={() => setCurrentTab('profile')}
+          className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
+            currentTab === 'profile' ? 'text-foreground font-semibold' : 'text-muted-foreground'
+          }`}
+        >
+          <UserRound className="w-5 h-5 mb-0.5" />
+          <span className="text-[10px]">Profil</span>
+        </button>
+      </nav>
+
+      {/* Footer for desktop */}
+      <footer className="hidden sm:block bg-card border-t border-border py-4 text-center text-xs text-muted-foreground mt-auto">
         <p>© 2026 KetemuIn RW 04</p>
       </footer>
 

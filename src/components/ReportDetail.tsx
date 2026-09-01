@@ -127,17 +127,17 @@ export default function ReportDetail({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/45 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-foreground/50 backdrop-blur-xs overflow-y-auto">
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.96 }}
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.98 }}
         transition={{ duration: 0.15 }}
-        className="relative bg-card text-card-foreground w-full max-w-2xl rounded-[var(--radius)] overflow-hidden shadow-lg border border-border max-h-[90vh] flex flex-col"
+        className="relative bg-card text-card-foreground w-full max-w-2xl rounded-t-[1rem] sm:rounded-[var(--radius)] overflow-hidden shadow-2xl border border-border max-h-[92vh] sm:max-h-[90vh] flex flex-col"
       >
         {/* Unapproved Notice */}
         {report.status_disetujui === false && (
-          <div className="px-4 py-2.5 bg-accent border-b border-border text-foreground text-xs font-medium flex items-center gap-2">
+          <div className="px-4 py-2 bg-accent border-b border-border text-foreground text-xs font-medium flex items-center gap-2">
             <Clock className="w-4 h-4 shrink-0 text-[var(--chart-1)]" />
             <span>Laporan menunggu persetujuan petugas RW 04 sebelum ditampilkan di papan publik.</span>
           </div>
@@ -147,21 +147,21 @@ export default function ReportDetail({
         <button
           onClick={onClose}
           aria-label="Tutup detail laporan"
-          className="absolute top-3 right-3 z-20 p-2 rounded-[var(--radius)] bg-background/80 hover:bg-background text-foreground border border-border transition-colors cursor-pointer"
+          className="absolute top-3 right-3 z-20 p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-full sm:rounded-[var(--radius)] bg-background/85 hover:bg-background text-foreground border border-border transition-colors cursor-pointer shadow-xs"
         >
           <X className="w-4 h-4" />
         </button>
 
         <div className="overflow-y-auto flex-1">
           {/* Main Visual Image */}
-          <div className="relative h-64 md:h-80 w-full bg-muted border-b border-border">
+          <div className="relative h-56 sm:h-72 md:h-80 w-full bg-muted border-b border-border">
             <img
               src={report.foto_url}
               alt={report.judul}
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent flex items-end p-5">
+            <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/30 to-transparent flex items-end p-4 sm:p-5">
               <div className="space-y-1.5 w-full">
                 <div className="flex flex-wrap gap-1.5">
                   <span
@@ -178,7 +178,7 @@ export default function ReportDetail({
                     {report.kategori}
                   </span>
                 </div>
-                <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground tracking-tight leading-tight">
+                <h2 className="font-serif text-xl sm:text-2xl md:text-3xl font-semibold text-foreground tracking-tight leading-tight">
                   {report.judul}
                 </h2>
               </div>
@@ -186,29 +186,29 @@ export default function ReportDetail({
           </div>
 
           {/* Details Metadata */}
-          <div className="p-6 space-y-6">
-            <div className="bg-accent/60 border border-border rounded-[var(--radius)] p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+            <div className="bg-accent/60 border border-border rounded-[var(--radius)] p-3.5 sm:p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[11px] text-muted-foreground uppercase font-medium block">Lokasi</span>
-                  <span className="font-medium text-foreground text-sm">{report.lokasi}</span>
+                  <span className="text-[10px] sm:text-[11px] text-muted-foreground uppercase font-medium block">Lokasi</span>
+                  <span className="font-medium text-foreground text-xs sm:text-sm">{report.lokasi}</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <Calendar className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[11px] text-muted-foreground uppercase font-medium block">Tanggal Kejadian</span>
-                  <span className="font-medium text-foreground text-sm">{formatDate(report.tgl_kejadian)}</span>
+                  <span className="text-[10px] sm:text-[11px] text-muted-foreground uppercase font-medium block">Tanggal Kejadian</span>
+                  <span className="font-medium text-foreground text-xs sm:text-sm">{formatDate(report.tgl_kejadian)}</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <UserRound className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[11px] text-muted-foreground uppercase font-medium block">Pelapor</span>
-                  <span className="font-medium text-foreground text-sm">{report.user_nama}</span>
+                  <span className="text-[10px] sm:text-[11px] text-muted-foreground uppercase font-medium block">Pelapor</span>
+                  <span className="font-medium text-foreground text-xs sm:text-sm">{report.user_nama}</span>
                 </div>
               </div>
             </div>
@@ -218,18 +218,18 @@ export default function ReportDetail({
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Deskripsi & Ciri Barang
               </h3>
-              <p className="text-foreground text-sm leading-relaxed whitespace-pre-line bg-background p-4 rounded-[var(--radius)] border border-border">
+              <p className="text-foreground text-xs sm:text-sm leading-relaxed whitespace-pre-line bg-background p-3.5 sm:p-4 rounded-[var(--radius)] border border-border">
                 {report.deskripsi}
               </p>
             </div>
 
             {/* Solved Status Card */}
             {isSolved && (
-              <div className="p-4 bg-accent border border-border rounded-[var(--radius)] flex items-start gap-3">
+              <div className="p-3.5 sm:p-4 bg-accent border border-border rounded-[var(--radius)] flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-semibold text-foreground">Laporan Selesai</h4>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <h4 className="text-xs sm:text-sm font-semibold text-foreground">Laporan Selesai</h4>
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                     Barang atau temuan ini telah diserahkan kembali. Tombol kontak dinonaktifkan.
                   </p>
                 </div>
@@ -238,18 +238,18 @@ export default function ReportDetail({
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="p-4 border-t border-border bg-card flex flex-col sm:flex-row gap-2.5 items-center justify-between">
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+        {/* Footer Actions (Responsive: full width on mobile, row on tablet/desktop) */}
+        <div className="p-3.5 sm:p-4 border-t border-border bg-card flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
+          <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
             {isAdmin && report.status_disetujui === false && (
               <button
                 id="btn-approve-report"
                 onClick={handleApproveClick}
                 disabled={loading}
-                className="w-full sm:w-auto px-4 py-2 text-xs font-medium text-white bg-[var(--chart-1)] hover:opacity-90 rounded-[var(--radius)] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="flex-1 sm:flex-initial min-h-[42px] px-3.5 sm:px-4 py-2 text-xs font-medium text-white bg-[var(--chart-1)] hover:opacity-90 rounded-[var(--radius)] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                Setujui Laporan
+                <span>Setujui</span>
               </button>
             )}
 
@@ -258,10 +258,10 @@ export default function ReportDetail({
                 id="btn-resolve-report"
                 onClick={handleResolveClick}
                 disabled={loading}
-                className="w-full sm:w-auto px-4 py-2 text-xs font-medium text-secondary-foreground bg-secondary hover:bg-muted border border-border rounded-[var(--radius)] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="flex-1 sm:flex-initial min-h-[42px] px-3.5 sm:px-4 py-2 text-xs font-medium text-secondary-foreground bg-secondary hover:bg-muted border border-border rounded-[var(--radius)] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                Tandai Selesai
+                <span>Selesai</span>
               </button>
             )}
 
@@ -270,10 +270,10 @@ export default function ReportDetail({
                 id="btn-delete-report"
                 onClick={handleDeleteClick}
                 disabled={loading}
-                className="w-full sm:w-auto px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/30 rounded-[var(--radius)] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="min-h-[42px] px-3.5 sm:px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/30 rounded-[var(--radius)] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                Hapus
+                <span className="hidden sm:inline">Hapus</span>
               </button>
             )}
           </div>
@@ -283,7 +283,7 @@ export default function ReportDetail({
               <button
                 id="btn-whatsapp-disabled"
                 disabled
-                className="w-full sm:w-auto px-5 py-2.5 bg-muted text-muted-foreground font-medium rounded-[var(--radius)] text-xs flex items-center justify-center gap-2 cursor-not-allowed border border-border"
+                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-muted text-muted-foreground font-medium rounded-[var(--radius)] text-xs flex items-center justify-center gap-2 cursor-not-allowed border border-border"
               >
                 <MessageCircle className="w-4 h-4" />
                 Kontak Dinonaktifkan
@@ -294,7 +294,7 @@ export default function ReportDetail({
                 href={getWhatsAppLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-5 py-2.5 bg-[var(--chart-1)] text-white hover:opacity-90 font-medium rounded-[var(--radius)] text-xs shadow-xs transition-opacity flex items-center justify-center gap-2"
+                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-[var(--chart-1)] text-white hover:opacity-90 font-medium rounded-[var(--radius)] text-xs sm:text-sm shadow-xs transition-opacity flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-4 h-4" />
                 Hubungi via WhatsApp
@@ -306,7 +306,7 @@ export default function ReportDetail({
                   onClose();
                   alert('Silakan masuk atau daftar akun terlebih dahulu untuk menghubungi pelapor.');
                 }}
-                className="w-full sm:w-auto px-5 py-2.5 bg-primary text-primary-foreground hover:opacity-90 font-medium rounded-[var(--radius)] text-xs transition-opacity flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-primary text-primary-foreground hover:opacity-90 font-medium rounded-[var(--radius)] text-xs sm:text-sm transition-opacity flex items-center justify-center gap-2 cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4" />
                 Masuk untuk Hubungi

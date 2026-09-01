@@ -6,10 +6,12 @@ export interface User {
   is_admin?: boolean;
 }
 
+export type TipeLaporan = 'HILANG' | 'DITEMUKAN';
+
 export interface Report {
   id_report: string;
   id_user: string;
-  tipe_laporan: 'HILANG' | 'DITEMUKAN';
+  tipe_laporan: TipeLaporan;
   kategori: string;
   judul: string;
   deskripsi: string;
