@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Report, User } from '../types';
-import { User as UserIcon, Phone, CheckCircle2, AlertTriangle, LogOut, Trash2, Calendar, MapPin } from 'lucide-react';
+import { Phone, CheckCircle2, LogOut, Trash2, Calendar, MapPin, Tag } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import ConfirmModal from './ConfirmModal';
-
 
 interface ProfileViewProps {
   currentUser: User;
@@ -27,7 +26,6 @@ export default function ProfileView({
   const [pendingResolveReport, setPendingResolveReport] = useState<Report | null>(null);
   const [pendingDeleteReport, setPendingDeleteReport] = useState<Report | null>(null);
 
-  // Filter reports submitted by the logged in user
   const userReports = reports.filter((r) => r.id_user === currentUser.id_user);
 
   const totalReports = userReports.length;
@@ -35,7 +33,7 @@ export default function ProfileView({
   const activeReports = totalReports - resolvedReports;
 
   const handleResolveClick = (e: React.MouseEvent, report: Report) => {
-    e.stopPropagation(); // Prevent opening detail view
+    e.stopPropagation();
     setPendingResolveReport(report);
   };
 
@@ -60,7 +58,7 @@ export default function ProfileView({
   };
 
   const handleDeleteClick = (e: React.MouseEvent, report: Report) => {
-    e.stopPropagation(); // Prevent opening detail view
+    e.stopPropagation();
     setPendingDeleteReport(report);
   };
 
@@ -91,24 +89,35 @@ export default function ProfileView({
     }
   };
 
+  // Extract initials for serif avatar
+  const getInitials = (name: string) => {
+    if (!name) return 'W';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
   return (
     <div className="space-y-6">
       {/* Profile Header Card */}
-      <div id="profile-card" className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div id="profile-card" className="bg-card text-card-foreground rounded-[var(--radius)] p-5 md:p-6 border border-border shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center text-foreground">
-            <UserIcon className="w-7 h-7" />
+          {/* Avatar with serif initials */}
+          <div className="w-14 h-14 rounded-full bg-muted text-foreground flex items-center justify-center font-serif text-xl font-bold border border-border shrink-0">
+            {getInitials(currentUser.nama_lengkap)}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-foreground">{currentUser.nama_lengkap}</h2>
+              <h2 className="font-serif text-xl font-semibold text-foreground">{currentUser.nama_lengkap}</h2>
               {currentUser.is_admin && (
-                <span className="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Admin RT
+                <span className="bg-secondary text-secondary-foreground text-[11px] font-semibold px-2 py-0.5 rounded-full border border-border">
+                  Petugas RW 04
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-muted-foreground text-sm mt-0.5">
+            <div className="flex items-center gap-1.5 text-muted-foreground text-xs mt-1">
               <Phone className="w-3.5 h-3.5 text-muted-foreground" />
               <span>+{currentUser.no_whatsapp}</span>
             </div>
@@ -118,81 +127,87 @@ export default function ProfileView({
         <button
           id="btn-logout"
           onClick={onLogout}
-          className="px-4 py-2 text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 rounded-xl transition-all flex items-center gap-1.5 shrink-0 self-stretch md:self-auto justify-center"
+          className="px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/30 rounded-[var(--radius)] transition-colors flex items-center gap-1.5 shrink-0 self-stretch md:self-auto justify-center cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
-          Keluar Aplikasi
+          Keluar
         </button>
       </div>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
-          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Total Post</span>
-          <span className="text-2xl font-black text-foreground mt-1 block">{totalReports}</span>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-card rounded-[var(--radius)] p-4 border border-border text-center">
+          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">Total Laporan</span>
+          <span className="font-serif text-2xl font-bold text-foreground mt-0.5 block">{totalReports}</span>
         </div>
-        <div className="bg-rose-50/50 rounded-2xl p-4 border border-rose-100/50 shadow-sm text-center">
-          <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest block">Aktif</span>
-          <span className="text-2xl font-black text-rose-600 mt-1 block">{activeReports}</span>
+        <div className="bg-card rounded-[var(--radius)] p-4 border border-border text-center">
+          <span className="text-[11px] font-medium text-[var(--chart-1)] uppercase tracking-wider block">Masih Aktif</span>
+          <span className="font-serif text-2xl font-bold text-[var(--chart-1)] mt-0.5 block">{activeReports}</span>
         </div>
-        <div className="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100/50 shadow-sm text-center">
-          <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest block">Selesai</span>
-          <span className="text-2xl font-black text-emerald-600 mt-1 block">{resolvedReports}</span>
+        <div className="bg-card rounded-[var(--radius)] p-4 border border-border text-center">
+          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">Selesai</span>
+          <span className="font-serif text-2xl font-bold text-foreground mt-0.5 block">{resolvedReports}</span>
         </div>
       </div>
 
       {/* User's Reports Section */}
       <div className="space-y-3">
-        <h3 className="text-base font-bold text-foreground">Daftar Laporan Saya</h3>
+        <h3 className="font-sans text-base font-semibold text-foreground">Daftar Laporan Saya</h3>
 
         {userReports.length === 0 ? (
-          <div className="bg-card rounded-3xl p-12 text-center border border-border shadow-inner">
-            <p className="text-muted-foreground text-sm">Anda belum pernah membuat laporan apa pun.</p>
-            <p className="text-xs text-muted-foreground mt-1">Gunakan tombol (+) di beranda untuk memulai.</p>
+          <div className="bg-card rounded-[var(--radius)] p-10 text-center border border-border">
+            <p className="text-foreground text-sm font-medium">Belum ada laporan yang Anda buat.</p>
+            <p className="text-xs text-muted-foreground mt-1">Gunakan tombol Buat Laporan untuk memposting barang hilang atau temuan.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {userReports.map((report) => (
               <motion.div
                 key={report.id_report}
                 layout
                 onClick={() => onReportClick(report)}
-                className={`p-4 bg-card hover:bg-accent border rounded-2xl flex items-center justify-between gap-4 transition-all cursor-pointer ${
-                  report.status_selesai ? 'border-emerald-100 bg-emerald-50/5 opacity-80' : 'border-border'
+                className={`p-3.5 bg-card hover:bg-accent border border-border rounded-[var(--radius)] flex items-center justify-between gap-4 transition-colors cursor-pointer shadow-xs ${
+                  report.status_selesai ? 'opacity-85' : ''
                 }`}
               >
-                <div className="flex items-center gap-4 overflow-hidden">
+                <div className="flex items-center gap-3.5 overflow-hidden">
                   <img
                     src={report.foto_url}
                     alt={report.judul}
                     referrerPolicy="no-referrer"
-                    className="w-12 h-12 rounded-xl object-cover shrink-0"
+                    className="w-14 h-14 rounded-[var(--radius)] object-cover shrink-0 border border-border"
                   />
-                  <div className="overflow-hidden">
-                    <div className="flex items-center gap-2">
+                  <div className="overflow-hidden space-y-1">
+                    <div className="flex items-center gap-1.5">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-wide ${
+                        className={`px-2 py-0.2 text-[10px] font-semibold rounded-full ${
                           report.tipe_laporan === 'HILANG'
-                            ? 'bg-rose-100 text-rose-700'
-                            : 'bg-emerald-100 text-emerald-700'
+                            ? 'bg-[var(--chart-1)] text-white'
+                            : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
                         }`}
                       >
                         {report.tipe_laporan}
                       </span>
-                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{report.kategori}</span>
+                      <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                        <Tag className="w-3 h-3 text-muted-foreground" />
+                        {report.kategori}
+                      </span>
                     </div>
-                    <h4 className={`text-sm font-bold text-foreground mt-0.5 truncate ${
+                    <h4 className={`text-sm font-semibold text-foreground truncate ${
                       report.status_selesai ? 'line-through text-muted-foreground' : ''
                     }`}>
                       {report.judul}
                     </h4>
-                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-1">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3 h-3 shrink-0" />
-                        <span className="truncate max-w-[120px]">{report.lokasi}</span>
+                        <span className="truncate max-w-[140px]">{report.lokasi}</span>
                       </span>
-                      <span>•</span>
-                      <span>{formatDate(report.tgl_kejadian)}</span>
+                      <span>·</span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3 shrink-0" />
+                        <span>{formatDate(report.tgl_kejadian)}</span>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -203,14 +218,15 @@ export default function ProfileView({
                       id={`btn-profile-resolve-${report.id_report}`}
                       type="button"
                       onClick={(e) => handleResolveClick(e, report)}
-                      className="p-2 bg-muted hover:bg-emerald-50 text-foreground hover:text-emerald-600 rounded-xl transition-all"
+                      className="px-2.5 py-1.5 bg-secondary hover:bg-muted text-secondary-foreground text-xs font-medium rounded-[var(--radius)] border border-border transition-colors flex items-center gap-1 cursor-pointer"
                       title="Tandai Selesai"
                     >
-                      <CheckCircle2 className="w-4 h-4" />
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Selesai</span>
                     </button>
                   ) : (
-                    <span className="text-emerald-600 text-xs font-bold flex items-center gap-1 pr-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span className="bg-[var(--chart-5)] text-foreground text-xs font-medium px-2.5 py-1 rounded-full border border-border flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" />
                       Selesai
                     </span>
                   )}
@@ -218,7 +234,7 @@ export default function ProfileView({
                     id={`btn-profile-delete-${report.id_report}`}
                     type="button"
                     onClick={(e) => handleDeleteClick(e, report)}
-                    className="p-2 hover:bg-rose-50 text-muted-foreground hover:text-rose-600 rounded-xl transition-all"
+                    className="p-1.5 hover:bg-destructive/10 text-muted-foreground hover:text-destructive border border-transparent hover:border-destructive/20 rounded-[var(--radius)] transition-colors cursor-pointer"
                     title="Hapus Laporan"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -230,11 +246,11 @@ export default function ProfileView({
         )}
       </div>
 
-      {/* Custom Confirm Modals */}
+      {/* Confirm Modals */}
       <ConfirmModal
         isOpen={pendingResolveReport !== null}
         title="Tandai Selesai"
-        message={`Apakah Anda yakin ingin menandai laporan "${pendingResolveReport?.judul}" sebagai SELESAI? Tindakan ini akan mengarsipkan laporan.`}
+        message={`Tandai laporan "${pendingResolveReport?.judul}" sebagai SELESAI?`}
         confirmText="Ya, Selesai"
         cancelText="Batal"
         onConfirm={executeResolve}
@@ -244,8 +260,8 @@ export default function ProfileView({
       <ConfirmModal
         isOpen={pendingDeleteReport !== null}
         title="Hapus Laporan"
-        message={`Apakah Anda yakin ingin menghapus laporan "${pendingDeleteReport?.judul}" secara permanen? Tindakan ini tidak dapat dibatalkan.`}
-        confirmText="Ya, Hapus"
+        message={`Hapus laporan "${pendingDeleteReport?.judul}" secara permanen?`}
+        confirmText="Hapus"
         cancelText="Batal"
         onConfirm={executeDelete}
         onCancel={() => setPendingDeleteReport(null)}

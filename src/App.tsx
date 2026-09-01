@@ -6,12 +6,13 @@ import ReportDetail from './components/ReportDetail';
 import ReportForm from './components/ReportForm';
 import ProfileView from './components/ProfileView';
 import LandingPage from './components/LandingPage';
-import { Search, Plus, SlidersHorizontal, Info, Compass, UserRound, Sparkles, CheckCircle2 } from 'lucide-react';
+import ThemeToggle from './components/ThemeToggle';
+import { Search, Plus, SlidersHorizontal, Compass, UserRound, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, auth, handleFirestoreError, OperationType } from './lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
-import logo from './assets/logo-black.png'
+import logoBlack from './assets/logo-black.png';
 
 const CATEGORIES: ('Semua' | Category)[] = ['Semua', 'Elektronik', 'Kunci', 'Dompet', 'Hewan', 'Dokumen', 'Lainnya'];
 
@@ -21,6 +22,28 @@ export default function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    const savedTheme = localStorage.getItem('ketemuin_theme');
+    if (savedTheme) {
+      return savedTheme === 'dark';
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('ketemuin_theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('ketemuin_theme', 'light');
+    }
+  }, [isDark]);
+
+  const toggleTheme = () => {
+    setIsDark(prev => !prev);
+  };
+
   const [viewState, setViewState] = useState<'landing' | 'login'>('landing');
 
   const [currentTab, setCurrentTab] = useState<'home' | 'profile' | 'approval'>('home');
@@ -28,7 +51,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
-  const [selectedTipe, setSelectedTipe] = useState<string>('Semua'); // 'Semua' | 'HILANG' | 'DITEMUKAN'
+  const [selectedTipe, setSelectedTipe] = useState<string>('Semua');
   const [authInitialized, setAuthInitialized] = useState(false);
 
   const visibleHomeReports = reports.filter(r => r.status_disetujui !== false || r.id_user === currentUser?.id_user);
@@ -55,7 +78,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Fetch reports on filter change
+  // Fetch reports
   const fetchReports = async () => {
     setLoading(true);
     try {
@@ -75,7 +98,6 @@ export default function App() {
         fetchedReports.push({ id_report: docSnap.id, ...docSnap.data() } as Report);
       });
 
-      // Filter by search query client-side
       if (searchQuery) {
         const sq = searchQuery.toLowerCase();
         fetchedReports = fetchedReports.filter(r =>
@@ -85,7 +107,6 @@ export default function App() {
         );
       }
 
-      // Sort by newest created_at first
       fetchedReports.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
       setReports(fetchedReports);
@@ -119,20 +140,18 @@ export default function App() {
     setCurrentTab('home');
   };
 
-  const handleReportCreated = (newReport: Report) => {
+  const handleReportCreated = () => {
     setShowAddModal(false);
     fetchReports();
   };
 
   const handleReportResolved = (id: string) => {
-    // Update local reports state
     setReports(prev =>
       prev.map(r => r.id_report === id ? { ...r, status_selesai: true } : r)
     );
     if (selectedReport && selectedReport.id_report === id) {
       setSelectedReport(prev => prev ? { ...prev, status_selesai: true } : null);
     }
-    // Re-sync with backend to get latest stats
     fetchReports();
   };
 
@@ -154,13 +173,10 @@ export default function App() {
 
   if (!authInitialized) {
     return (
-      <div className="min-h-screen bg-accent flex flex-col justify-center items-center p-4">
-        <div className="flex flex-col items-center gap-3">
-          <svg className="animate-spin h-8 w-8 text-foreground" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <p className="text-muted-foreground text-xs font-semibold">Menghubungkan ke server...</p>
+      <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4">
+        <div className="flex flex-col items-center gap-2.5">
+          <div className="w-6 h-6 border-2 border-foreground border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-muted-foreground text-xs font-medium">Menghubungkan layanan...</p>
         </div>
       </div>
     );
@@ -181,6 +197,8 @@ export default function App() {
             setSelectedTipe={setSelectedTipe}
             onNavigateToLogin={() => setViewState('login')}
             onReportClick={(report) => setSelectedReport(report)}
+            isDark={isDark}
+            onToggleTheme={toggleTheme}
           />
           <AnimatePresence>
             {selectedReport && (
@@ -198,78 +216,99 @@ export default function App() {
     }
 
     return (
-      <div className="min-h-screen bg-accent flex flex-col justify-center items-center p-4 relative">
-        <button
-          onClick={() => setViewState('landing')}
-          className="absolute top-4 left-4 px-4 py-2 bg-card hover:bg-muted text-foreground border border-border text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
-        >
-          ← Kembali ke Beranda
-        </button>
+      <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 relative">
+        <div className="absolute top-4 left-4 flex items-center gap-2">
+          <button
+            onClick={() => setViewState('landing')}
+            className="px-3.5 py-1.5 bg-card hover:bg-muted text-foreground border border-border text-xs font-medium rounded-[var(--radius)] flex items-center gap-1.5 cursor-pointer shadow-xs"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Kembali ke Beranda
+          </button>
+        </div>
+        <div className="absolute top-4 right-4">
+          <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+        </div>
         <LoginRegister onLoginSuccess={handleLoginSuccess} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-accent text-foreground flex flex-col font-sans">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
 
       {/* Top Navbar Header */}
-      <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border">
+      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xs border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-2.5">
-            <img className="w-15" src={logo} alt="" />
+          <div className="flex items-center gap-3">
+            <img className="w-9 h-9 object-contain dark:invert" src={logoBlack} alt="KetemuIn Logo" referrerPolicy="no-referrer" />
             <div>
-              <h1 className="text-lg font-black tracking-tight text-foreground">
+              <h1 className="font-serif text-xl font-semibold tracking-tight text-foreground leading-none">
                 KetemuIn
               </h1>
-              <p className="text-[10px] text-muted-foreground font-semibold tracking-wide">Lost & Found RW 04</p>
+              <span className="text-[11px] text-muted-foreground font-medium">Lost & Found RW 04</span>
             </div>
           </div>
 
-          {/* Navigation Control */}
-          <div className="flex bg-muted p-1 rounded-xl">
-            <button
-              id="nav-btn-home"
-              onClick={() => setCurrentTab('home')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                currentTab === 'home'
-                  ? 'bg-card text-foreground shadow-sm border border-border/50'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Compass className="w-3.5 h-3.5" />
-              Beranda
-            </button>
-            {currentUser?.is_admin && (
+          <div className="flex items-center gap-2">
+            <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+
+            {/* Navigation Tabs */}
+            <div className="flex bg-muted p-1 rounded-[var(--radius)] border border-border">
               <button
-                id="nav-btn-approval"
-                onClick={() => setCurrentTab('approval')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 relative ${
-                  currentTab === 'approval'
-                    ? 'bg-card text-foreground shadow-sm border border-border/50'
+                id="nav-btn-home"
+                onClick={() => setCurrentTab('home')}
+                className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  currentTab === 'home'
+                    ? 'bg-card text-foreground font-semibold shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                Persetujuan
-                {pendingReports.length > 0 && (
-                  <span className="bg-amber-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse">
-                    {pendingReports.length}
-                  </span>
-                )}
+                <Compass className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Beranda</span>
               </button>
-            )}
+
+              {currentUser?.is_admin && (
+                <button
+                  id="nav-btn-approval"
+                  onClick={() => setCurrentTab('approval')}
+                  className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+                    currentTab === 'approval'
+                      ? 'bg-card text-foreground font-semibold shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Persetujuan</span>
+                  {pendingReports.length > 0 && (
+                    <span className="bg-[var(--chart-1)] text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">
+                      {pendingReports.length}
+                    </span>
+                  )}
+                </button>
+              )}
+
+              <button
+                id="nav-btn-profile"
+                onClick={() => setCurrentTab('profile')}
+                className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  currentTab === 'profile'
+                    ? 'bg-card text-foreground font-semibold shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <UserRound className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Profil</span>
+              </button>
+            </div>
+
             <button
-              id="nav-btn-profile"
-              onClick={() => setCurrentTab('profile')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                currentTab === 'profile'
-                  ? 'bg-card text-foreground shadow-sm border border-border/50'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+              id="btn-header-add"
+              onClick={() => setShowAddModal(true)}
+              className="hidden md:flex px-3.5 py-1.5 rounded-[var(--radius)] bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity items-center gap-1.5 cursor-pointer shadow-xs"
             >
-              <UserRound className="w-3.5 h-3.5" />
-              Profilku
+              <Plus className="w-3.5 h-3.5" />
+              Lapor Barang
             </button>
           </div>
         </div>
@@ -278,36 +317,34 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 pb-24">
         {currentTab === 'approval' && currentUser?.is_admin ? (
-          <div className="space-y-6">
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+          <div className="space-y-5">
+            <div className="bg-card border border-border rounded-[var(--radius)] p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-extrabold text-amber-800 tracking-tight flex items-center gap-2">
-                  <SlidersHorizontal className="w-5 h-5 text-amber-600" />
-                  Persetujuan Laporan Petugas RW 04
+                <h3 className="font-serif text-lg font-semibold text-foreground flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+                  Persetujuan Laporan Petugas
                 </h3>
-                <p className="text-xs text-amber-700 leading-relaxed max-w-xl">
-                  Berikut adalah daftar laporan penemuan atau kehilangan barang yang diajukan oleh warga. Tinjau kelayakan isi laporan sebelum disetujui untuk dipublikasikan ke papan beranda publik KetemuIn.
+                <p className="text-xs text-muted-foreground max-w-xl leading-relaxed">
+                  Tinjau laporan barang yang diajukan warga sebelum dipublikasikan pada papan pengumuman publik.
                 </p>
               </div>
-              <div className="bg-amber-100 text-amber-800 text-xs px-4 py-2 rounded-2xl font-black shrink-0 shadow-sm">
-                {pendingReports.length} Laporan Tertunda
+              <div className="bg-secondary text-secondary-foreground text-xs px-3 py-1 rounded-full border border-border font-medium shrink-0">
+                {pendingReports.length} Laporan Menunggu
               </div>
             </div>
 
             {pendingReports.length === 0 ? (
-              <div className="bg-card rounded-3xl p-16 text-center border border-border shadow-sm max-w-lg mx-auto">
-                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-600 border border-emerald-100">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <h3 className="text-base font-bold text-foreground">Semua Laporan Bersih!</h3>
-                <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-                  Kerja bagus! Tidak ada laporan baru yang menunggu persetujuan petugas saat ini.
+              <div className="bg-card rounded-[var(--radius)] p-12 text-center border border-border max-w-md mx-auto">
+                <CheckCircle2 className="w-8 h-8 text-foreground mx-auto mb-2" />
+                <h4 className="font-sans text-sm font-semibold text-foreground">Tidak Ada Antrean</h4>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Semua laporan dari warga telah disetujui atau sudah diproses.
                 </p>
               </div>
             ) : (
               <motion.div
                 layout
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
               >
                 {pendingReports.map((report) => (
                   <ReportCard
@@ -320,109 +357,98 @@ export default function App() {
             )}
           </div>
         ) : currentTab === 'home' ? (
-          <div className="space-y-6">
+          <div className="space-y-5">
 
-            {/* Header Greeting & Banner */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Header Greeting */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-extrabold text-foreground tracking-tight">
-                  Halo, <span className="text-foreground">{currentUser.nama_lengkap}</span>! 👋
+                <h2 className="font-serif text-2xl font-semibold text-foreground tracking-tight">
+                  Halo, {currentUser.nama_lengkap}
                 </h2>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Ada barang hilang atau ditemukan di sekitar lingkungan kita? Laporkan segera!
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Daftar laporan barang hilang dan penemuan aktif di lingkungan RW 04.
                 </p>
               </div>
-
-              {/* Informative notification widget */}
-              <div className="bg-accent border border-border/60 rounded-2xl p-4 flex items-center gap-3 max-w-md shadow-sm">
-                <Sparkles className="w-5 h-5 text-muted-foreground shrink-0 animate-pulse" />
-                <p className="text-[11px] text-muted-foreground leading-normal font-medium">
-                  <strong>Tips Jujur:</strong> Cantumkan deskripsi barang se-rinci mungkin, namun hindari memposting nomor pin atau detail isi dompet yang terlalu rahasia.
-                </p>
-              </div>
+              
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="sm:hidden w-full py-2.5 px-4 rounded-[var(--radius)] bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Plus className="w-4 h-4" />
+                Buat Laporan Baru
+              </button>
             </div>
 
-            {/* Filter, Search & Sorting Controls */}
-            <div className="bg-card rounded-3xl p-4 border border-border shadow-sm space-y-4">
-
-              {/* Row 1: Search and Type Filter */}
-              <div className="flex flex-col md:flex-row gap-3">
+            {/* Filter & Search Bar */}
+            <div className="bg-card rounded-[var(--radius)] p-4 border border-border space-y-3 shadow-xs">
+              <div className="flex flex-col md:flex-row gap-2.5">
                 <div className="relative flex-1">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
                     <Search className="w-4 h-4" />
                   </span>
                   <input
                     id="search-input"
                     type="text"
-                    placeholder="Cari kata kunci laporan (misal: dompet, honda, kucing...)"
+                    placeholder="Cari berdasarkan nama barang, lokasi, atau kata kunci..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 text-xs bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
                   />
                 </div>
 
-                {/* Status Toggle (Semua, Kehilangan, Penemuan) */}
-                <div className="flex gap-1 bg-muted p-1 rounded-xl shrink-0 self-start md:self-auto w-full md:w-auto">
+                {/* Status Toggle */}
+                <div className="flex gap-1 bg-muted p-1 rounded-[var(--radius)] border border-border shrink-0">
                   {['Semua', 'HILANG', 'DITEMUKAN'].map((tipe) => (
                     <button
                       key={tipe}
                       id={`status-filter-${tipe}`}
                       onClick={() => setSelectedTipe(tipe)}
-                      className={`flex-1 md:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      className={`px-3 py-1 text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${
                         selectedTipe === tipe
                           ? tipe === 'HILANG'
-                            ? 'bg-rose-500 text-primary-foreground shadow-sm'
-                            : tipe === 'DITEMUKAN'
-                            ? 'bg-emerald-500 text-primary-foreground shadow-sm'
-                            : 'bg-primary text-primary-foreground shadow-sm'
+                            ? 'bg-[var(--chart-1)] text-white shadow-xs'
+                            : 'bg-primary text-primary-foreground shadow-xs'
                           : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      {tipe === 'HILANG' ? 'Kehilangan' : tipe === 'DITEMUKAN' ? 'Penemuan' : 'Semua Status'}
+                      {tipe === 'HILANG' ? 'Kehilangan' : tipe === 'DITEMUKAN' ? 'Penemuan' : 'Semua'}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Row 2: Category Chip Bar */}
-              <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Kategori</span>
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
-                  {CATEGORIES.map((cat) => (
-                    <button
-                      key={cat}
-                      id={`category-filter-${cat}`}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
-                        selectedCategory === cat
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'bg-accent hover:bg-muted text-muted-foreground hover:text-foreground border border-border/40'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
+              {/* Category Chips */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1">
+                <span className="text-xs font-medium text-muted-foreground shrink-0 mr-1">Kategori:</span>
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    id={`category-filter-${cat}`}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-2.5 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 transition-colors cursor-pointer border ${
+                      selectedCategory === cat
+                        ? 'border-primary bg-primary text-primary-foreground font-semibold'
+                        : 'border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Reports Grid Content */}
             {loading && visibleHomeReports.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-3">
-                <svg className="animate-spin h-8 w-8 text-foreground" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+              <div className="flex flex-col items-center justify-center py-16 gap-2">
+                <div className="w-6 h-6 border-2 border-foreground border-t-transparent rounded-full animate-spin"></div>
                 <p className="text-muted-foreground text-xs">Memuat daftar laporan...</p>
               </div>
             ) : visibleHomeReports.length === 0 ? (
-              <div className="bg-card rounded-3xl p-16 text-center border border-border shadow-sm max-w-lg mx-auto">
-                <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-4 text-muted-foreground">
-                  <SlidersHorizontal className="w-8 h-8" />
-                </div>
-                <h3 className="text-base font-bold text-foreground">Laporan Tidak Ditemukan</h3>
-                <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-                  Belum ada laporan yang cocok dengan kata kunci atau filter yang Anda pilih saat ini.
+              <div className="bg-card rounded-[var(--radius)] p-12 text-center border border-border max-w-md mx-auto">
+                <SlidersHorizontal className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                <h4 className="font-sans text-sm font-semibold text-foreground">Tidak Ada Laporan</h4>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Tidak ditemukan laporan yang sesuai dengan kriteria pencarian Anda.
                 </p>
                 <button
                   onClick={() => {
@@ -430,15 +456,15 @@ export default function App() {
                     setSelectedCategory('Semua');
                     setSelectedTipe('Semua');
                   }}
-                  className="mt-4 text-xs text-foreground hover:text-muted-foreground font-bold underline transition-colors"
+                  className="mt-3 text-xs text-foreground hover:underline font-medium cursor-pointer"
                 >
-                  Reset Semua Filter
+                  Reset Filter
                 </button>
               </div>
             ) : (
               <motion.div
                 layout
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
               >
                 {visibleHomeReports.map((report) => (
                   <ReportCard
@@ -463,21 +489,21 @@ export default function App() {
         )}
       </main>
 
-      {/* Floating Action Button (FAB) */}
+      {/* Floating Action Button (FAB) for Mobile */}
       {currentTab === 'home' && (
         <button
           id="btn-fab-add"
           onClick={() => setShowAddModal(true)}
-          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-primary hover:bg-secondary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all group"
+          className="md:hidden fixed bottom-6 right-6 z-40 w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity cursor-pointer"
           title="Buat Laporan Baru"
         >
-          <Plus className="w-6 h-6 transition-transform group-hover:rotate-90" />
+          <Plus className="w-5 h-5" />
         </button>
       )}
 
-      {/* Footer copyright */}
-      <footer className="bg-card border-t border-border py-6 text-center text-xs text-muted-foreground">
-        <p>© 2026 KetemuIn RW 04. Dibuat dengan kejujuran & kepedulian sosial.</p>
+      {/* Footer */}
+      <footer className="bg-card border-t border-border py-5 text-center text-xs text-muted-foreground">
+        <p>© 2026 KetemuIn RW 04</p>
       </footer>
 
       {/* Overlays / Modals */}
@@ -504,4 +530,3 @@ export default function App() {
     </div>
   );
 }
-

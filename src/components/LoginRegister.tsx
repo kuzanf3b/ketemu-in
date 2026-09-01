@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { User } from '../types';
-import { Eye, EyeOff, KeyRound, Phone, UserRound, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, KeyRound, Phone, UserRound, ArrowRight, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import logo from '../assets/logo-white.png';
 
 interface LoginRegisterProps {
   onLoginSuccess: (user: User) => void;
@@ -34,7 +33,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
 
     const cleanedPhone = noWhatsapp.replace(/[^0-9]/g, '');
     if (cleanedPhone.length < 9) {
-      setError('Nomor WhatsApp tidak valid (minimal 9 angka).');
+      setError('Nomor WhatsApp minimal 9 digit angka.');
       setLoading(false);
       return;
     }
@@ -43,15 +42,14 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
 
     try {
       if (isLogin) {
-        // 1. Firebase Sign In
         let userCredential;
         try {
           userCredential = await signInWithEmailAndPassword(auth, email, password);
         } catch (authErr: any) {
           if (authErr.code === 'auth/user-not-found' || authErr.code === 'auth/wrong-password' || authErr.code === 'auth/invalid-credential') {
-            throw new Error('Nomor WhatsApp atau kata sandi salah.');
+            throw new Error('Nomor WhatsApp atau kata sandi tidak cocok.');
           } else if (authErr.code === 'auth/invalid-email') {
-            throw new Error('Format login tidak valid.');
+            throw new Error('Format nomor WhatsApp tidak valid.');
           } else {
             throw authErr;
           }
@@ -60,7 +58,6 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
         const uid = userCredential.user.uid;
         const userDocRef = doc(db, 'users', uid);
         
-        // 2. Fetch User Profile
         let userDoc;
         try {
           userDoc = await getDoc(userDocRef);
@@ -69,7 +66,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
         }
 
         if (!userDoc || !userDoc.exists()) {
-          throw new Error('Data profil warga tidak ditemukan di sistem.');
+          throw new Error('Data pengguna tidak ditemukan.');
         }
 
         const userData = userDoc.data();
@@ -82,7 +79,6 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
         });
 
       } else {
-        // 1. Firebase Sign Up
         let userCredential;
         try {
           userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -90,7 +86,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           if (authErr.code === 'auth/email-already-in-use') {
             throw new Error('Nomor WhatsApp ini sudah terdaftar.');
           } else if (authErr.code === 'auth/weak-password') {
-            throw new Error('Kata sandi terlalu pendek (minimal 6 karakter).');
+            throw new Error('Kata sandi minimal 6 karakter.');
           } else {
             throw authErr;
           }
@@ -99,13 +95,12 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
         const uid = userCredential.user.uid;
         const newUser: User = {
           id_user: uid,
-          nama_lengkap: namaLengkap,
+          nama_lengkap: namaLengkap.trim(),
           no_whatsapp: cleanedPhone,
           created_at: new Date().toISOString(),
           is_admin: isPetugas
         };
 
-        // 2. Save Profile in Firestore
         try {
           await setDoc(doc(db, 'users', uid), newUser);
         } catch (fsErr) {
@@ -122,19 +117,15 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
   };
 
   return (
-    <div id="login-container" className="w-full max-w-md mx-auto bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+    <div id="login-container" className="w-full max-w-md mx-auto bg-card text-card-foreground rounded-[var(--radius)] shadow-md border border-border overflow-hidden">
       {/* Brand Header */}
-      <div className="bg-primary px-6 py-8 text-center text-primary-foreground relative">
-        <div className="relative z-10">
-          <div className="flex justify-center">
-            <img className="w-20" src={logo} alt="" />
-          </div>
-          <h2 className="text-2xl font-extrabold font-sans tracking-tight">KetemuIn</h2>
-        </div>
+      <div className="bg-primary text-primary-foreground p-6 text-center border-b border-border">
+        <h2 className="font-serif text-3xl font-semibold tracking-tight">KetemuIn</h2>
+        <p className="text-xs text-primary-foreground/80 mt-1">Layanan Lost & Found RW 04</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-border">
+      <div className="flex border-b border-border bg-muted/40">
         <button
           id="btn-tab-login"
           type="button"
@@ -142,13 +133,13 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             setIsLogin(true);
             setError('');
           }}
-          className={`flex-1 py-4.5 text-center font-bold text-xs uppercase tracking-wider transition-colors ${
+          className={`flex-1 py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${
             isLogin
-              ? 'text-foreground border-b-2 border-slate-900 bg-accent/50'
-              : 'text-muted-foreground hover:text-foreground hover:bg-accent/20'
+              ? 'text-foreground border-b-2 border-primary bg-card font-semibold'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          Masuk Akun
+          Masuk
         </button>
         <button
           id="btn-tab-register"
@@ -157,10 +148,10 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             setIsLogin(false);
             setError('');
           }}
-          className={`flex-1 py-4.5 text-center font-bold text-xs uppercase tracking-wider transition-colors ${
+          className={`flex-1 py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${
             !isLogin
-              ? 'text-foreground border-b-2 border-slate-900 bg-accent/50'
-              : 'text-muted-foreground hover:text-foreground hover:bg-accent/20'
+              ? 'text-foreground border-b-2 border-primary bg-card font-semibold'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           Daftar Baru
@@ -171,9 +162,9 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
       <div className="p-6">
         {error && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-3 mb-4 text-xs font-medium text-rose-600 bg-rose-50 border border-rose-100 rounded-lg"
+            className="p-3 mb-4 text-xs font-medium text-destructive-foreground bg-destructive/90 rounded-[var(--radius)]"
           >
             {error}
           </motion.div>
@@ -181,65 +172,72 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground block">Nama Lengkap</label>
+            <div className="space-y-1.5">
+              <label htmlFor="register-name" className="text-xs font-semibold text-foreground block">
+                Nama Lengkap
+              </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
                   <UserRound className="w-4 h-4" />
                 </span>
                 <input
                   id="register-name"
                   type="text"
-                  placeholder="Contoh: Budi Santoso"
+                  placeholder="Nama sesuai KTP/warga"
                   value={namaLengkap}
                   onChange={(e) => setNamaLengkap(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
                   required={!isLogin}
                 />
               </div>
             </div>
           )}
 
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-muted-foreground block">No. WhatsApp</label>
+          <div className="space-y-1.5">
+            <label htmlFor="login-whatsapp" className="text-xs font-semibold text-foreground block">
+              Nomor WhatsApp
+            </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
                 <Phone className="w-4 h-4" />
               </span>
               <input
                 id="login-whatsapp"
-                type="text"
-                placeholder="Contoh: 081234567890"
+                type="tel"
+                placeholder="08xxxxxxxxxx"
                 value={noWhatsapp}
                 onChange={(e) => setNoWhatsapp(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
+                className="w-full pl-9 pr-3 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
                 required
               />
             </div>
-            <p className="text-[10px] text-muted-foreground leading-tight">
-              Digunakan untuk login dan agar warga lain bisa menghubungi Anda langsung via WhatsApp.
+            <p className="text-[11px] text-muted-foreground">
+              Digunakan untuk identifikasi akun dan kontak langsung dengan pelapor/penemu.
             </p>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-muted-foreground block">Kata Sandi</label>
+          <div className="space-y-1.5">
+            <label htmlFor="login-password" className="text-xs font-semibold text-foreground block">
+              Kata Sandi
+            </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
                 <KeyRound className="w-4 h-4" />
               </span>
               <input
                 id="login-password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
+                placeholder="Minimal 6 karakter"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 text-sm bg-accent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/5 focus:border-primary transition-all text-foreground"
+                className="w-full pl-9 pr-9 py-2 text-sm bg-card border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-muted-foreground"
+                aria-label="Tampilkan kata sandi"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -253,10 +251,11 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                 type="checkbox"
                 checked={isPetugas}
                 onChange={(e) => setIsPetugas(e.target.checked)}
-                className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 accent-slate-950"
+                className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
               />
-              <label htmlFor="register-is-petugas" className="text-xs font-bold text-muted-foreground cursor-pointer select-none">
-                Saya mendaftar sebagai Petugas RW 04
+              <label htmlFor="register-is-petugas" className="text-xs text-foreground cursor-pointer select-none flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />
+                Daftar sebagai Petugas RW 04
               </label>
             </div>
           )}
@@ -265,27 +264,19 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             id="btn-auth-submit"
             type="submit"
             disabled={loading}
-            className="w-full mt-4 bg-primary hover:bg-secondary text-primary-foreground font-bold py-2.5 px-4 rounded-xl transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full mt-4 bg-primary hover:opacity-90 text-primary-foreground font-semibold py-2.5 px-4 rounded-[var(--radius)] transition-opacity text-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {loading ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4 text-primary-foreground" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Memproses...
-              </span>
+              <span>Memproses...</span>
             ) : (
               <>
-                {isLogin ? 'Masuk Sekarang' : 'Daftar Akun'}
+                {isLogin ? 'Masuk' : 'Daftar Akun'}
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
-
       </div>
     </div>
   );
 }
-

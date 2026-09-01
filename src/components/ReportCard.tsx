@@ -1,19 +1,18 @@
 import React from 'react';
 import { Report } from '../types';
-import { MapPin, Calendar, Tag, CheckCircle2, AlertTriangle, HelpCircle } from 'lucide-react';
+import { MapPin, Calendar, Tag, CheckCircle2, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface ReportCardProps {
+  key?: React.Key;
   report: Report;
   onClick: () => void;
-  key?: string;
 }
 
 export default function ReportCard({ report, onClick }: ReportCardProps) {
   const isLost = report.tipe_laporan === 'HILANG';
   const isSolved = report.status_selesai;
 
-  // Render proper Indonesian date format
   const formatDate = (dateStr: string) => {
     try {
       const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
@@ -24,90 +23,89 @@ export default function ReportCard({ report, onClick }: ReportCardProps) {
   };
 
   return (
-    <motion.div
+    <motion.article
+      id={`report-card-${report.id_report}`}
       layout
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      whileHover={{ y: -2, transition: { duration: 0.15 } }}
       onClick={onClick}
-      className={`group relative bg-card rounded-2xl overflow-hidden border transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md flex flex-col h-full ${
-        isSolved ? 'border-emerald-100 bg-emerald-50/10 opacity-90' : 'border-border'
+      className={`group relative bg-card text-card-foreground rounded-[var(--radius)] overflow-hidden border border-border transition-all duration-150 cursor-pointer shadow-sm hover:shadow hover:bg-accent/40 flex flex-col h-full ${
+        isSolved ? 'opacity-85' : ''
       }`}
     >
-      {/* Label and Image Section */}
-      <div className="relative h-48 w-full bg-muted overflow-hidden">
+      {/* Thumbnail & Badges */}
+      <div className="relative aspect-[4/3] w-full bg-muted overflow-hidden border-b border-border">
         <img
           src={report.foto_url}
           alt={report.judul}
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
         />
-        
-        {/* Absolute top badges */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-2 z-10">
+
+        {/* Top Badges */}
+        <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 z-10">
           <span
-            className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide shadow-md ${
+            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide shadow-xs ${
               isLost
-                ? 'bg-rose-500 text-primary-foreground'
-                : 'bg-emerald-500 text-primary-foreground'
+                ? 'bg-[var(--chart-1)] text-white'
+                : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
             }`}
           >
             {report.tipe_laporan}
           </span>
 
-          <span className="bg-primary/75 backdrop-blur-sm text-primary-foreground px-2.5 py-1 rounded-full text-[10px] font-semibold flex items-center gap-1">
-            <Tag className="w-3 h-3" />
+          <span className="bg-card/90 backdrop-blur-xs text-foreground px-2 py-0.5 rounded-full text-xs font-medium border border-border flex items-center gap-1">
+            <Tag className="w-3 h-3 text-muted-foreground" />
             {report.kategori}
           </span>
         </div>
 
         {report.status_disetujui === false && (
-          <div className="absolute top-3 right-3 z-10">
-            <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[10px] font-extrabold tracking-wide uppercase shadow-md flex items-center gap-1">
-              <AlertTriangle className="w-3 h-3" />
-              Tertunda
+          <div className="absolute top-2.5 right-2.5 z-10">
+            <span className="px-2 py-0.5 rounded-full bg-[var(--chart-1)] text-white text-xs font-semibold flex items-center gap-1 shadow-xs">
+              <Clock className="w-3 h-3" />
+              Menunggu Persetujuan
             </span>
           </div>
         )}
 
         {isSolved && (
-          <div className="absolute inset-0 bg-primary/40 backdrop-blur-[1px] flex items-center justify-center">
-            <div className="bg-emerald-600 text-primary-foreground px-4 py-2 rounded-xl flex items-center gap-2 font-bold text-sm shadow-lg scale-105">
-              <CheckCircle2 className="w-5 h-5" />
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-xs flex items-center justify-center p-3">
+            <div className="bg-[var(--chart-5)] text-foreground border border-border px-3 py-1.5 rounded-full flex items-center gap-1.5 font-semibold text-xs shadow-xs">
+              <CheckCircle2 className="w-3.5 h-3.5" />
               SELESAI / KETEMU
             </div>
           </div>
         )}
       </div>
 
-      {/* Content Section */}
-      <div className="p-4 flex-1 flex flex-col justify-between">
+      {/* Card Content */}
+      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
         <div>
-          <h3 className={`text-base font-bold text-foreground leading-snug line-clamp-2 mb-2 group-hover:text-foreground transition-colors ${isSolved ? 'line-through text-muted-foreground' : ''}`}>
+          <h3 className={`font-sans font-semibold text-base text-foreground leading-snug line-clamp-2 ${isSolved ? 'line-through text-muted-foreground' : ''}`}>
             {report.judul}
           </h3>
-          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-4">
+          <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed mt-1.5 font-normal">
             {report.deskripsi}
           </p>
         </div>
 
-        <div className="space-y-2 pt-3 border-t border-border text-[11px] text-muted-foreground">
-          <div className="flex items-center gap-2">
+        <div className="space-y-1.5 pt-2.5 border-t border-border text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             <span className="truncate">{report.lokasi}</span>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between text-xs pt-0.5">
+            <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
               <span>{formatDate(report.tgl_kejadian)}</span>
             </div>
-            
-            <span className="text-[10px] text-muted-foreground">
-              Oleh: <strong className="text-muted-foreground font-medium">{report.user_nama}</strong>
+            <span className="text-muted-foreground truncate max-w-[120px]">
+              {report.user_nama}
             </span>
           </div>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }
-

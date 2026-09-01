@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Report, User } from '../types';
-import { X, Phone, CheckCircle2, Calendar, MapPin, Tag, UserRound, Trash2, AlertTriangle } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { X, MessageCircle, CheckCircle2, Calendar, MapPin, Tag, UserRound, Trash2, Clock } from 'lucide-react';
+import { motion } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import ConfirmModal from './ConfirmModal';
@@ -15,7 +15,14 @@ interface ReportDetailProps {
   onApprove?: (id: string) => void;
 }
 
-export default function ReportDetail({ report, currentUser, onClose, onResolve, onDelete, onApprove }: ReportDetailProps) {
+export default function ReportDetail({
+  report,
+  currentUser,
+  onClose,
+  onResolve,
+  onDelete,
+  onApprove
+}: ReportDetailProps) {
   const [loading, setLoading] = useState(false);
   const [showResolveConfirm, setShowResolveConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -100,18 +107,16 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
     }
   };
 
-  // Build the WhatsApp message link
   const getWhatsAppLink = () => {
     if (!report.user_whatsapp) return '#';
     let phone = report.user_whatsapp.replace(/[^0-9]/g, '');
     if (phone.startsWith('0')) {
       phone = '62' + phone.substring(1);
     }
-    const text = `Halo ${report.user_nama}, saya melihat laporan Anda di aplikasi KetemuIn mengenai "${report.judul}". Apakah barang/hewan tersebut sudah ada perkembangan?`;
+    const text = `Halo ${report.user_nama}, saya melihat laporan Anda di KetemuIn mengenai "${report.judul}". Apakah barang ini sudah ada perkembangan?`;
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   };
 
-  // Render proper Indonesian date format
   const formatDate = (dateStr: string) => {
     try {
       const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -122,106 +127,110 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/60 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/45 backdrop-blur-xs overflow-y-auto">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        transition={{ duration: 0.2 }}
-        className="relative bg-card w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl border border-border max-h-[90vh] flex flex-col"
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        transition={{ duration: 0.15 }}
+        className="relative bg-card text-card-foreground w-full max-w-2xl rounded-[var(--radius)] overflow-hidden shadow-lg border border-border max-h-[90vh] flex flex-col"
       >
-        {/* Banner unapproved */}
+        {/* Unapproved Notice */}
         {report.status_disetujui === false && (
-          <div className="px-5 py-3.5 bg-amber-500/10 border-b border-amber-500/20 text-amber-600 text-xs font-bold flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" />
-            Laporan ini berstatus "Tertunda" karena belum disetujui oleh Petugas RW 04. Hanya pelapor dan petugas yang dapat melihat laporan ini.
+          <div className="px-4 py-2.5 bg-accent border-b border-border text-foreground text-xs font-medium flex items-center gap-2">
+            <Clock className="w-4 h-4 shrink-0 text-[var(--chart-1)]" />
+            <span>Laporan menunggu persetujuan petugas RW 04 sebelum ditampilkan di papan publik.</span>
           </div>
         )}
-        {/* Header/Close bar */}
-        <div className="absolute top-4 right-4 z-20">
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full bg-primary/60 text-primary-foreground hover:bg-primary/80 transition-colors backdrop-blur-sm"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          aria-label="Tutup detail laporan"
+          className="absolute top-3 right-3 z-20 p-2 rounded-[var(--radius)] bg-background/80 hover:bg-background text-foreground border border-border transition-colors cursor-pointer"
+        >
+          <X className="w-4 h-4" />
+        </button>
 
         <div className="overflow-y-auto flex-1">
           {/* Main Visual Image */}
-          <div className="relative h-72 md:h-96 w-full bg-muted">
+          <div className="relative h-64 md:h-80 w-full bg-muted border-b border-border">
             <img
               src={report.foto_url}
               alt={report.judul}
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
-              <div className="space-y-2 text-primary-foreground">
-                <div className="flex flex-wrap gap-2">
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent flex items-end p-5">
+              <div className="space-y-1.5 w-full">
+                <div className="flex flex-wrap gap-1.5">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide shadow-md ${
-                      report.tipe_laporan === 'HILANG' ? 'bg-rose-500' : 'bg-emerald-500'
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                      report.tipe_laporan === 'HILANG'
+                        ? 'bg-[var(--chart-1)] text-white'
+                        : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
                     }`}
                   >
                     {report.tipe_laporan}
                   </span>
-                  <span className="bg-background/20 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                    <Tag className="w-3.5 h-3.5" />
+                  <span className="bg-card/90 border border-border px-2.5 py-0.5 rounded-full text-xs font-medium text-foreground flex items-center gap-1">
+                    <Tag className="w-3 h-3 text-muted-foreground" />
                     {report.kategori}
                   </span>
                 </div>
-                <h2 className="text-xl md:text-2xl font-extrabold tracking-tight leading-tight">
+                <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground tracking-tight leading-tight">
                   {report.judul}
                 </h2>
               </div>
             </div>
           </div>
 
-          {/* Details Section */}
+          {/* Details Metadata */}
           <div className="p-6 space-y-6">
-            <div className="bg-accent rounded-2xl p-4 flex flex-wrap gap-y-4 gap-x-6 text-sm">
-              <div className="flex items-center gap-2.5 min-w-[200px]">
-                <MapPin className="w-5 h-5 text-foreground shrink-0" />
+            <div className="bg-accent/60 border border-border rounded-[var(--radius)] p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div className="flex items-start gap-2.5">
+                <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[10px] text-muted-foreground block font-bold uppercase tracking-wider">Perkiraan Lokasi</span>
-                  <span className="text-muted-foreground font-medium">{report.lokasi}</span>
+                  <span className="text-[11px] text-muted-foreground uppercase font-medium block">Lokasi</span>
+                  <span className="font-medium text-foreground text-sm">{report.lokasi}</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5 min-w-[200px]">
-                <Calendar className="w-5 h-5 text-foreground shrink-0" />
+              <div className="flex items-start gap-2.5">
+                <Calendar className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[10px] text-muted-foreground block font-bold uppercase tracking-wider">Tanggal Kejadian</span>
-                  <span className="text-muted-foreground font-medium">{formatDate(report.tgl_kejadian)}</span>
+                  <span className="text-[11px] text-muted-foreground uppercase font-medium block">Tanggal Kejadian</span>
+                  <span className="font-medium text-foreground text-sm">{formatDate(report.tgl_kejadian)}</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5 min-w-[200px]">
-                <UserRound className="w-5 h-5 text-foreground shrink-0" />
+              <div className="flex items-start gap-2.5">
+                <UserRound className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-[10px] text-muted-foreground block font-bold uppercase tracking-wider">Pelapor (Warga)</span>
-                  <span className="text-muted-foreground font-medium">{report.user_nama}</span>
+                  <span className="text-[11px] text-muted-foreground uppercase font-medium block">Pelapor</span>
+                  <span className="font-medium text-foreground text-sm">{report.user_nama}</span>
                 </div>
               </div>
             </div>
 
             {/* Description */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Detail & Ciri-ciri Ciri</h4>
-              <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line bg-accent/40 p-4 rounded-xl border border-border">
+            <div className="space-y-1.5">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Deskripsi & Ciri Barang
+              </h3>
+              <p className="text-foreground text-sm leading-relaxed whitespace-pre-line bg-background p-4 rounded-[var(--radius)] border border-border">
                 {report.deskripsi}
               </p>
             </div>
 
-            {/* Quick warning if solved */}
+            {/* Solved Status Card */}
             {isSolved && (
-              <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="p-4 bg-accent border border-border rounded-[var(--radius)] flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-bold text-emerald-800">Laporan Telah Selesai</h4>
-                  <p className="text-xs text-emerald-600 mt-1 leading-normal">
-                    Barang atau hewan yang dilaporkan ini sudah ditemukan/dikembalikan ke pemiliknya. Tombol hubungi WhatsApp telah dinonaktifkan demi privasi.
+                  <h4 className="text-sm font-semibold text-foreground">Laporan Selesai</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Barang atau temuan ini telah diserahkan kembali. Tombol kontak dinonaktifkan.
                   </p>
                 </div>
               </div>
@@ -229,17 +238,17 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
           </div>
         </div>
 
-        {/* Footer actions bar */}
-        <div className="p-4 border-t border-border bg-accent flex flex-col md:flex-row gap-3 items-center justify-between">
-          <div className="flex flex-wrap gap-2 w-full md:w-auto">
+        {/* Footer Actions */}
+        <div className="p-4 border-t border-border bg-card flex flex-col sm:flex-row gap-2.5 items-center justify-between">
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             {isAdmin && report.status_disetujui === false && (
               <button
                 id="btn-approve-report"
                 onClick={handleApproveClick}
                 disabled={loading}
-                className="w-full md:w-auto px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2 text-xs font-medium text-white bg-[var(--chart-1)] hover:opacity-90 rounded-[var(--radius)] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="w-3.5 h-3.5" />
                 Setujui Laporan
               </button>
             )}
@@ -249,9 +258,9 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
                 id="btn-resolve-report"
                 onClick={handleResolveClick}
                 disabled={loading}
-                className="w-full md:w-auto px-4 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-secondary rounded-xl transition-all flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2 text-xs font-medium text-secondary-foreground bg-secondary hover:bg-muted border border-border rounded-[var(--radius)] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="w-3.5 h-3.5" />
                 Tandai Selesai
               </button>
             )}
@@ -261,23 +270,23 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
                 id="btn-delete-report"
                 onClick={handleDeleteClick}
                 disabled={loading}
-                className="w-full md:w-auto px-4 py-2.5 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-100 rounded-xl transition-all flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/30 rounded-[var(--radius)] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
                 Hapus
               </button>
             )}
           </div>
 
-          <div className="w-full md:w-auto flex justify-end">
+          <div className="w-full sm:w-auto flex justify-end">
             {isSolved ? (
               <button
                 id="btn-whatsapp-disabled"
                 disabled
-                className="w-full md:w-auto px-6 py-3 bg-secondary text-muted-foreground font-bold rounded-xl text-sm flex items-center justify-center gap-2 cursor-not-allowed"
+                className="w-full sm:w-auto px-5 py-2.5 bg-muted text-muted-foreground font-medium rounded-[var(--radius)] text-xs flex items-center justify-center gap-2 cursor-not-allowed border border-border"
               >
-                <Phone className="w-4 h-4" />
-                WhatsApp Dinonaktifkan
+                <MessageCircle className="w-4 h-4" />
+                Kontak Dinonaktifkan
               </button>
             ) : currentUser ? (
               <a
@@ -285,9 +294,9 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
                 href={getWhatsAppLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full md:w-auto px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-primary-foreground font-bold rounded-xl text-sm shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-5 py-2.5 bg-[var(--chart-1)] text-white hover:opacity-90 font-medium rounded-[var(--radius)] text-xs shadow-xs transition-opacity flex items-center justify-center gap-2"
               >
-                <Phone className="w-4 h-4 fill-white" />
+                <MessageCircle className="w-4 h-4" />
                 Hubungi via WhatsApp
               </a>
             ) : (
@@ -295,11 +304,11 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
                 id="btn-whatsapp-login-prompt"
                 onClick={() => {
                   onClose();
-                  alert('Silakan Masuk atau Daftar Akun terlebih dahulu untuk dapat menghubungi pelapor.');
+                  alert('Silakan masuk atau daftar akun terlebih dahulu untuk menghubungi pelapor.');
                 }}
-                className="w-full md:w-auto px-6 py-3 bg-primary hover:bg-secondary text-primary-foreground font-bold rounded-xl text-sm shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 bg-primary text-primary-foreground hover:opacity-90 font-medium rounded-[var(--radius)] text-xs transition-opacity flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Phone className="w-4 h-4" />
+                <MessageCircle className="w-4 h-4" />
                 Masuk untuk Hubungi
               </button>
             )}
@@ -307,11 +316,11 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
         </div>
       </motion.div>
 
-      {/* Custom Confirm Modals */}
+      {/* Confirm Modals */}
       <ConfirmModal
         isOpen={showResolveConfirm}
         title="Tandai Selesai"
-        message="Apakah Anda yakin ingin menandai laporan ini sebagai SELESAI? Tindakan ini akan mengarsipkan laporan dan menonaktifkan tombol WhatsApp."
+        message="Tandai laporan ini sebagai selesai dan arsipkan dari daftar aktif?"
         confirmText="Ya, Selesai"
         cancelText="Batal"
         onConfirm={executeResolve}
@@ -321,8 +330,8 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
       <ConfirmModal
         isOpen={showDeleteConfirm}
         title="Hapus Laporan"
-        message="Apakah Anda yakin ingin menghapus laporan ini secara permanen? Tindakan ini tidak dapat dibatalkan."
-        confirmText="Ya, Hapus"
+        message="Hapus laporan ini secara permanen dari basis data?"
+        confirmText="Hapus Permanen"
         cancelText="Batal"
         onConfirm={executeDelete}
         onCancel={() => setShowDeleteConfirm(false)}
@@ -332,8 +341,8 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
       <ConfirmModal
         isOpen={showApproveConfirm}
         title="Setujui Laporan"
-        message="Apakah Anda yakin ingin menyetujui laporan ini? Laporan yang disetujui akan langsung tampil di beranda publik KetemuIn."
-        confirmText="Ya, Setujui"
+        message="Setujui laporan ini agar tampil pada papan pengumuman warga?"
+        confirmText="Setujui"
         cancelText="Batal"
         onConfirm={executeApprove}
         onCancel={() => setShowApproveConfirm(false)}
@@ -341,4 +350,3 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
     </div>
   );
 }
-

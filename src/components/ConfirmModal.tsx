@@ -32,64 +32,67 @@ export default function ConfirmModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onCancel}
-            className="fixed inset-0 bg-foreground/45 backdrop-blur-[2px]"
+            className="fixed inset-0 bg-foreground/45 backdrop-blur-xs"
           />
 
           {/* Modal Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ type: 'spring', duration: 0.3 }}
-            className="relative bg-card w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-border z-10 overflow-hidden flex flex-col gap-4"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.15 }}
+            className="relative bg-card text-card-foreground w-full max-w-sm rounded-[var(--radius)] p-5 shadow-lg border border-border z-10 flex flex-col gap-4"
           >
             {/* Close Button */}
             <button
               onClick={onCancel}
-              className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-muted-foreground transition-colors"
+              aria-label="Tutup"
+              className="absolute top-3.5 right-3.5 p-1 rounded-[var(--radius)] hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
 
             {/* Icon & Title */}
-            <div className="flex items-start gap-3.5 mt-2">
+            <div className="flex items-start gap-3 mt-1">
               <div
-                className={`p-3 rounded-2xl shrink-0 ${
-                  isDanger ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'
+                className={`p-2.5 rounded-[var(--radius)] shrink-0 border ${
+                  isDanger
+                    ? 'bg-destructive/10 text-destructive border-destructive/20'
+                    : 'bg-primary/10 text-primary border-primary/20'
                 }`}
               >
                 {isDanger ? (
-                  <AlertTriangle className="w-6 h-6" />
+                  <AlertTriangle className="w-5 h-5" />
                 ) : (
-                  <CheckCircle2 className="w-6 h-6" />
+                  <CheckCircle2 className="w-5 h-5" />
                 )}
               </div>
-              <div className="space-y-1">
-                <h3 className="text-base font-extrabold text-foreground leading-tight">
+              <div className="space-y-1 pr-4">
+                <h3 className="font-sans text-base font-semibold text-foreground leading-tight">
                   {title}
                 </h3>
-                <p className="text-muted-foreground text-xs leading-relaxed font-medium">
+                <p className="text-muted-foreground text-xs leading-relaxed">
                   {message}
                 </p>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2.5 mt-2 justify-end">
+            <div className="flex gap-2 mt-2 justify-end">
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 text-xs font-bold text-muted-foreground hover:text-foreground bg-accent hover:bg-muted rounded-xl transition-all"
+                className="px-3.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted bg-secondary rounded-[var(--radius)] border border-border transition-colors cursor-pointer"
               >
                 {cancelText}
               </button>
               <button
                 type="button"
                 onClick={onConfirm}
-                className={`px-4 py-2 text-xs font-bold text-primary-foreground rounded-xl transition-all shadow-md ${
+                className={`px-4 py-1.5 text-xs font-semibold text-white rounded-[var(--radius)] transition-opacity hover:opacity-90 shadow-xs cursor-pointer ${
                   isDanger
-                    ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/10 hover:shadow-rose-600/20'
-                    : 'bg-primary hover:bg-secondary shadow-primary/10 hover:shadow-primary/20'
+                    ? 'bg-destructive'
+                    : 'bg-primary'
                 }`}
               >
                 {confirmText}
@@ -101,4 +104,3 @@ export default function ConfirmModal({
     </AnimatePresence>
   );
 }
-
