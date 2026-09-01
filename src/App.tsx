@@ -6,7 +6,7 @@ import ReportDetail from './components/ReportDetail';
 import ReportForm from './components/ReportForm';
 import ProfileView from './components/ProfileView';
 import LandingPage from './components/LandingPage';
-import { Search, Plus, SlidersHorizontal, Info, Compass, UserRound, Sparkles } from 'lucide-react';
+import { Search, Plus, SlidersHorizontal, Info, Compass, UserRound, Sparkles, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, auth, handleFirestoreError, OperationType } from './lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
@@ -23,13 +23,16 @@ export default function App() {
 
   const [viewState, setViewState] = useState<'landing' | 'login'>('landing');
 
-  const [currentTab, setCurrentTab] = useState<'home' | 'profile'>('home');
+  const [currentTab, setCurrentTab] = useState<'home' | 'profile' | 'approval'>('home');
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [selectedTipe, setSelectedTipe] = useState<string>('Semua'); // 'Semua' | 'HILANG' | 'DITEMUKAN'
   const [authInitialized, setAuthInitialized] = useState(false);
+
+  const visibleHomeReports = reports.filter(r => r.status_disetujui !== false || r.id_user === currentUser?.id_user);
+  const pendingReports = reports.filter(r => r.status_disetujui === false);
 
   // Modals state
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
@@ -139,6 +142,16 @@ export default function App() {
     fetchReports();
   };
 
+  const handleReportApproved = (id: string) => {
+    setReports(prev =>
+      prev.map(r => r.id_report === id ? { ...r, status_disetujui: true } : r)
+    );
+    if (selectedReport && selectedReport.id_report === id) {
+      setSelectedReport(prev => prev ? { ...prev, status_disetujui: true } : null);
+    }
+    fetchReports();
+  };
+
   if (!authInitialized) {
     return (
       <div className="min-h-screen bg-accent flex flex-col justify-center items-center p-4">
@@ -158,7 +171,7 @@ export default function App() {
       return (
         <>
           <LandingPage
-            reports={reports}
+            reports={reports.filter(r => r.status_disetujui !== false)}
             loading={loading}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -227,6 +240,25 @@ export default function App() {
               <Compass className="w-3.5 h-3.5" />
               Beranda
             </button>
+            {currentUser?.is_admin && (
+              <button
+                id="nav-btn-approval"
+                onClick={() => setCurrentTab('approval')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 relative ${
+                  currentTab === 'approval'
+                    ? 'bg-card text-foreground shadow-sm border border-border/50'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                Persetujuan
+                {pendingReports.length > 0 && (
+                  <span className="bg-amber-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-black animate-pulse">
+                    {pendingReports.length}
+                  </span>
+                )}
+              </button>
+            )}
             <button
               id="nav-btn-profile"
               onClick={() => setCurrentTab('profile')}
@@ -245,7 +277,49 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 pb-24">
-        {currentTab === 'home' ? (
+        {currentTab === 'approval' && currentUser?.is_admin ? (
+          <div className="space-y-6">
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+              <div className="space-y-1">
+                <h3 className="text-sm font-extrabold text-amber-800 tracking-tight flex items-center gap-2">
+                  <SlidersHorizontal className="w-5 h-5 text-amber-600" />
+                  Persetujuan Laporan Petugas RW 04
+                </h3>
+                <p className="text-xs text-amber-700 leading-relaxed max-w-xl">
+                  Berikut adalah daftar laporan penemuan atau kehilangan barang yang diajukan oleh warga. Tinjau kelayakan isi laporan sebelum disetujui untuk dipublikasikan ke papan beranda publik KetemuIn.
+                </p>
+              </div>
+              <div className="bg-amber-100 text-amber-800 text-xs px-4 py-2 rounded-2xl font-black shrink-0 shadow-sm">
+                {pendingReports.length} Laporan Tertunda
+              </div>
+            </div>
+
+            {pendingReports.length === 0 ? (
+              <div className="bg-card rounded-3xl p-16 text-center border border-border shadow-sm max-w-lg mx-auto">
+                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-600 border border-emerald-100">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h3 className="text-base font-bold text-foreground">Semua Laporan Bersih!</h3>
+                <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+                  Kerja bagus! Tidak ada laporan baru yang menunggu persetujuan petugas saat ini.
+                </p>
+              </div>
+            ) : (
+              <motion.div
+                layout
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {pendingReports.map((report) => (
+                  <ReportCard
+                    key={report.id_report}
+                    report={report}
+                    onClick={() => setSelectedReport(report)}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </div>
+        ) : currentTab === 'home' ? (
           <div className="space-y-6">
 
             {/* Header Greeting & Banner */}
@@ -333,7 +407,7 @@ export default function App() {
             </div>
 
             {/* Reports Grid Content */}
-            {loading && reports.length === 0 ? (
+            {loading && visibleHomeReports.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <svg className="animate-spin h-8 w-8 text-foreground" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -341,7 +415,7 @@ export default function App() {
                 </svg>
                 <p className="text-muted-foreground text-xs">Memuat daftar laporan...</p>
               </div>
-            ) : reports.length === 0 ? (
+            ) : visibleHomeReports.length === 0 ? (
               <div className="bg-card rounded-3xl p-16 text-center border border-border shadow-sm max-w-lg mx-auto">
                 <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-4 text-muted-foreground">
                   <SlidersHorizontal className="w-8 h-8" />
@@ -366,7 +440,7 @@ export default function App() {
                 layout
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               >
-                {reports.map((report) => (
+                {visibleHomeReports.map((report) => (
                   <ReportCard
                     key={report.id_report}
                     report={report}
@@ -415,6 +489,7 @@ export default function App() {
             onClose={() => setSelectedReport(null)}
             onResolve={handleReportResolved}
             onDelete={handleReportDeleted}
+            onApprove={handleReportApproved}
           />
         )}
 

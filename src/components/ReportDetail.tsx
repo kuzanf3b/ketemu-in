@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Report, User } from '../types';
-import { X, Phone, CheckCircle2, Calendar, MapPin, Tag, UserRound, Trash2 } from 'lucide-react';
+import { X, Phone, CheckCircle2, Calendar, MapPin, Tag, UserRound, Trash2, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
@@ -12,12 +12,14 @@ interface ReportDetailProps {
   onClose: () => void;
   onResolve: (id: string) => void;
   onDelete: (id: string) => void;
+  onApprove?: (id: string) => void;
 }
 
-export default function ReportDetail({ report, currentUser, onClose, onResolve, onDelete }: ReportDetailProps) {
+export default function ReportDetail({ report, currentUser, onClose, onResolve, onDelete, onApprove }: ReportDetailProps) {
   const [loading, setLoading] = useState(false);
   const [showResolveConfirm, setShowResolveConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
 
   const isOwner = currentUser?.id_user === report.id_user;
   const isAdmin = currentUser?.is_admin === true;
@@ -71,6 +73,33 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
     }
   };
 
+  const handleApproveClick = () => {
+    if (!currentUser) return;
+    setShowApproveConfirm(true);
+  };
+
+  const executeApprove = async () => {
+    setShowApproveConfirm(false);
+    setLoading(true);
+    try {
+      try {
+        await updateDoc(doc(db, 'reports', report.id_report), {
+          status_disetujui: true
+        });
+      } catch (fsErr) {
+        handleFirestoreError(fsErr, OperationType.UPDATE, `reports/${report.id_report}`);
+      }
+
+      if (onApprove) {
+        onApprove(report.id_report);
+      }
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Build the WhatsApp message link
   const getWhatsAppLink = () => {
     if (!report.user_whatsapp) return '#';
@@ -101,6 +130,13 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
         transition={{ duration: 0.2 }}
         className="relative bg-card w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl border border-border max-h-[90vh] flex flex-col"
       >
+        {/* Banner unapproved */}
+        {report.status_disetujui === false && (
+          <div className="px-5 py-3.5 bg-amber-500/10 border-b border-amber-500/20 text-amber-600 text-xs font-bold flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" />
+            Laporan ini berstatus "Tertunda" karena belum disetujui oleh Petugas RW 04. Hanya pelapor dan petugas yang dapat melihat laporan ini.
+          </div>
+        )}
         {/* Header/Close bar */}
         <div className="absolute top-4 right-4 z-20">
           <button
@@ -195,7 +231,19 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
 
         {/* Footer actions bar */}
         <div className="p-4 border-t border-border bg-accent flex flex-col md:flex-row gap-3 items-center justify-between">
-          <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="flex flex-wrap gap-2 w-full md:w-auto">
+            {isAdmin && report.status_disetujui === false && (
+              <button
+                id="btn-approve-report"
+                onClick={handleApproveClick}
+                disabled={loading}
+                className="w-full md:w-auto px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                Setujui Laporan
+              </button>
+            )}
+
             {(isOwner || isAdmin) && !isSolved && (
               <button
                 id="btn-resolve-report"
@@ -279,6 +327,16 @@ export default function ReportDetail({ report, currentUser, onClose, onResolve, 
         onConfirm={executeDelete}
         onCancel={() => setShowDeleteConfirm(false)}
         isDanger
+      />
+
+      <ConfirmModal
+        isOpen={showApproveConfirm}
+        title="Setujui Laporan"
+        message="Apakah Anda yakin ingin menyetujui laporan ini? Laporan yang disetujui akan langsung tampil di beranda publik KetemuIn."
+        confirmText="Ya, Setujui"
+        cancelText="Batal"
+        onConfirm={executeApprove}
+        onCancel={() => setShowApproveConfirm(false)}
       />
     </div>
   );

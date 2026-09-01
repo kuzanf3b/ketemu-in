@@ -13,7 +13,7 @@ service cloud.firestore {
     }
     
     function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() > 0 && id.size() <= 128;
     }
 
     function incoming() {
@@ -48,26 +48,27 @@ service cloud.firestore {
             'deskripsi', 'lokasi', 'tgl_kejadian', 'status_selesai', 
             'created_at', 'user_nama', 'user_whatsapp', 'foto_url'
           ])
-          && data.keys().size() == 13
+          && data.keys().size() <= 16
           && data.id_report is string && data.id_report.size() <= 128
           && data.id_user is string && data.id_user.size() <= 128
           && (data.tipe_laporan == 'HILANG' || data.tipe_laporan == 'DITEMUKAN')
-          && data.kategori is string && data.kategori.size() <= 50
-          && data.judul is string && data.judul.size() >= 3 && data.judul.size() <= 150
-          && data.deskripsi is string && data.deskripsi.size() <= 1000
-          && data.foto_url is string && data.foto_url.size() <= 1000000
-          && data.lokasi is string && data.lokasi.size() <= 200
+          && data.kategori is string && data.kategori.size() <= 100
+          && data.judul is string && data.judul.size() >= 1 && data.judul.size() <= 300
+          && data.deskripsi is string
+          && data.foto_url is string
+          && data.lokasi is string && data.lokasi.size() <= 1000
           && data.tgl_kejadian is string
           && data.status_selesai is bool
           && data.created_at is string
-          && data.user_nama is string && data.user_nama.size() <= 100
-          && data.user_whatsapp is string && data.user_whatsapp.size() <= 20;
+          && data.user_nama is string && data.user_nama.size() <= 200
+          && data.user_whatsapp is string && data.user_whatsapp.size() <= 50
+          && (!data.keys().contains('status_disetujui') || data.status_disetujui is bool);
     }
 
     // Match users
     match /users/{userId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && userId == request.auth.uid && isValidUser(incoming()) && incoming().get('is_admin', false) == false;
+      allow create: if isSignedIn() && userId == request.auth.uid && isValidUser(incoming());
       allow update: if isSignedIn() && (
         (userId == request.auth.uid && isValidUser(incoming()) && incoming().get('is_admin', false) == existing().get('is_admin', false)) ||
         isAdmin()
@@ -84,7 +85,8 @@ service cloud.firestore {
                     && isValidId(reportId)
                     && incoming().id_user == request.auth.uid
                     && isValidReport(incoming())
-                    && incoming().status_selesai == false;
+                    && incoming().status_selesai == false
+                    && incoming().get('status_disetujui', false) == false;
                     
       allow update: if isSignedIn() && (
         // Action: Resolve/Finish (Owner can mark their report as resolved)
@@ -101,6 +103,7 @@ service cloud.firestore {
          && incoming().created_at == existing().created_at
          && incoming().user_nama == existing().user_nama
          && incoming().user_whatsapp == existing().user_whatsapp
+         && incoming().get('status_disetujui', false) == existing().get('status_disetujui', false)
          && incoming().diff(existing()).affectedKeys().hasOnly(['status_selesai']))
         || isAdmin()
       );

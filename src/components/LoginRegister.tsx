@@ -19,6 +19,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isPetugas, setIsPetugas] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,7 +102,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           nama_lengkap: namaLengkap,
           no_whatsapp: cleanedPhone,
           created_at: new Date().toISOString(),
-          is_admin: false
+          is_admin: isPetugas
         };
 
         // 2. Save Profile in Firestore
@@ -244,6 +245,21 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
               </button>
             </div>
           </div>
+
+          {!isLogin && (
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                id="register-is-petugas"
+                type="checkbox"
+                checked={isPetugas}
+                onChange={(e) => setIsPetugas(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 accent-slate-950"
+              />
+              <label htmlFor="register-is-petugas" className="text-xs font-bold text-muted-foreground cursor-pointer select-none">
+                Saya mendaftar sebagai Petugas RW 04
+              </label>
+            </div>
+          )}
 
           <button
             id="btn-auth-submit"

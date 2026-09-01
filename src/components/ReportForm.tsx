@@ -165,7 +165,8 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
         status_selesai: false,
         created_at: new Date().toISOString(),
         user_nama: currentUser.nama_lengkap,
-        user_whatsapp: currentUser.no_whatsapp
+        user_whatsapp: currentUser.no_whatsapp,
+        status_disetujui: false
       };
 
       try {

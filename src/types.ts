@@ -21,6 +21,7 @@ export interface Report {
   // Included when fetched with user relation
   user_nama?: string;
   user_whatsapp?: string;
+  status_disetujui?: boolean;
 }
 
 export type Category = 'Elektronik' | 'Kunci' | 'Dompet' | 'Hewan' | 'Dokumen' | 'Lainnya';

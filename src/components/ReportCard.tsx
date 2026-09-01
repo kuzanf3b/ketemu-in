@@ -59,6 +59,15 @@ export default function ReportCard({ report, onClick }: ReportCardProps) {
           </span>
         </div>
 
+        {report.status_disetujui === false && (
+          <div className="absolute top-3 right-3 z-10">
+            <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[10px] font-extrabold tracking-wide uppercase shadow-md flex items-center gap-1">
+              <AlertTriangle className="w-3 h-3" />
+              Tertunda
+            </span>
+          </div>
+        )}
+
         {isSolved && (
           <div className="absolute inset-0 bg-primary/40 backdrop-blur-[1px] flex items-center justify-center">
             <div className="bg-emerald-600 text-primary-foreground px-4 py-2 rounded-xl flex items-center gap-2 font-bold text-sm shadow-lg scale-105">
