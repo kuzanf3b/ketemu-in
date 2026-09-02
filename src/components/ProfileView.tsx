@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Report, User } from '../types';
-import { Phone, CheckCircle2, LogOut, Trash2, Calendar, MapPin, Tag } from 'lucide-react';
+import { Phone, CheckCircle2, LogOut, Trash2, Calendar, MapPin, Tag, Hourglass } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getAutoDeleteStatus } from '../lib/cleanupUtils';
 import ConfirmModal from './ConfirmModal';
 
 interface ProfileViewProps {
@@ -11,7 +12,7 @@ interface ProfileViewProps {
   reports: Report[];
   onLogout: () => void;
   onReportClick: (report: Report) => void;
-  onResolve: (id: string) => void;
+  onResolve: (id: string, selesaiAt?: string) => void;
   onDelete: (id: string) => void;
 }
 
@@ -41,17 +42,19 @@ export default function ProfileView({
     if (!pendingResolveReport) return;
     const report = pendingResolveReport;
     setPendingResolveReport(null);
+    const nowIso = new Date().toISOString();
 
     try {
       try {
         await updateDoc(doc(db, 'reports', report.id_report), {
-          status_selesai: true
+          status_selesai: true,
+          selesai_at: nowIso
         });
       } catch (fsErr) {
         handleFirestoreError(fsErr, OperationType.UPDATE, `reports/${report.id_report}`);
       }
 
-      onResolve(report.id_report);
+      onResolve(report.id_report, nowIso);
     } catch (err: any) {
       alert(err.message);
     }
@@ -225,10 +228,16 @@ export default function ProfileView({
                       <span>Selesai</span>
                     </button>
                   ) : (
-                    <span className="bg-[var(--chart-5)] text-foreground text-xs font-medium px-2.5 py-1 rounded-full border border-border flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" />
-                      Selesai
-                    </span>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="bg-[var(--chart-5)] text-foreground text-xs font-medium px-2.5 py-1 rounded-full border border-border flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Selesai
+                      </span>
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-1 bg-muted px-2 py-0.5 rounded-full border border-border">
+                        <Hourglass className="w-3 h-3 text-[var(--chart-1)]" />
+                        {getAutoDeleteStatus(report).formattedCountdown}
+                      </span>
+                    </div>
                   )}
                   <button
                     id={`btn-profile-delete-${report.id_report}`}
@@ -249,8 +258,8 @@ export default function ProfileView({
       {/* Confirm Modals */}
       <ConfirmModal
         isOpen={pendingResolveReport !== null}
-        title="Tandai Selesai"
-        message={`Tandai laporan "${pendingResolveReport?.judul}" sebagai SELESAI?`}
+        title="Tandai Selesai / Ketemu"
+        message={`Tandai laporan "${pendingResolveReport?.judul}" sebagai SELESAI? Laporan yang sudah selesai akan terhapus otomatis dari sistem setelah 24 jam.`}
         confirmText="Ya, Selesai"
         cancelText="Batal"
         onConfirm={executeResolve}

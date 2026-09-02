@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User, Report, Category } from './types';
 import LoginRegister from './components/LoginRegister';
 import ReportCard from './components/ReportCard';
@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { db, auth, handleFirestoreError, OperationType } from './lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
+import { purgeExpiredResolvedReports, getAutoDeleteStatus } from './lib/cleanupUtils';
 import logoBlack from './assets/logo-black.png';
 
 const CATEGORIES: ('Semua' | Category)[] = ['Semua', 'Elektronik', 'Kunci', 'Dompet', 'Hewan', 'Dokumen', 'Lainnya'];
@@ -87,7 +88,7 @@ export default function App() {
   }, []);
 
   // Fetch reports
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     setLoading(true);
     try {
       const reportsRef = collection(db, 'reports');
@@ -105,6 +106,16 @@ export default function App() {
       querySnapshot.forEach((docSnap) => {
         fetchedReports.push({ id_report: docSnap.id, ...docSnap.data() } as Report);
       });
+
+      // Auto-cleanup: Trigger Firestore deletion of any expired resolved reports (> 24 hours) for logged in sessions
+      if (currentUser) {
+        purgeExpiredResolvedReports(fetchedReports).catch((err) => {
+          console.warn('Background auto-purge notice:', err);
+        });
+      }
+
+      // Filter out expired items immediately so UI is always fresh
+      fetchedReports = fetchedReports.filter(r => !getAutoDeleteStatus(r).isExpired);
 
       if (searchQuery) {
         const sq = searchQuery.toLowerCase();
@@ -124,13 +135,31 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory, selectedTipe, searchQuery]);
 
   useEffect(() => {
     if (authInitialized) {
       fetchReports();
     }
-  }, [authInitialized, currentUser, searchQuery, selectedCategory, selectedTipe]);
+  }, [authInitialized, currentUser, fetchReports]);
+
+  // Periodic interval to purge resolved reports that pass the 24-hour mark while app is open
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setReports((prevReports) => {
+        const hasExpired = prevReports.some(r => r.status_selesai && getAutoDeleteStatus(r).isExpired);
+        if (hasExpired) {
+          if (currentUser) {
+            purgeExpiredResolvedReports(prevReports).catch(console.warn);
+          }
+          return prevReports.filter(r => !getAutoDeleteStatus(r).isExpired);
+        }
+        return prevReports;
+      });
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [currentUser]);
 
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
@@ -153,12 +182,13 @@ export default function App() {
     fetchReports();
   };
 
-  const handleReportResolved = (id: string) => {
+  const handleReportResolved = (id: string, selesaiAt?: string) => {
+    const resolvedTime = selesaiAt || new Date().toISOString();
     setReports(prev =>
-      prev.map(r => r.id_report === id ? { ...r, status_selesai: true } : r)
+      prev.map(r => r.id_report === id ? { ...r, status_selesai: true, selesai_at: resolvedTime } : r)
     );
     if (selectedReport && selectedReport.id_report === id) {
-      setSelectedReport(prev => prev ? { ...prev, status_selesai: true } : null);
+      setSelectedReport(prev => prev ? { ...prev, status_selesai: true, selesai_at: resolvedTime } : null);
     }
     fetchReports();
   };

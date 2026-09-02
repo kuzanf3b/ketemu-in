@@ -19,6 +19,7 @@ export interface Report {
   lokasi: string;
   tgl_kejadian: string;
   status_selesai: boolean;
+  selesai_at?: string;
   created_at: string;
   // Included when fetched with user relation
   user_nama?: string;

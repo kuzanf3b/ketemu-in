@@ -62,7 +62,8 @@ service cloud.firestore {
           && data.created_at is string
           && data.user_nama is string && data.user_nama.size() <= 200
           && data.user_whatsapp is string && data.user_whatsapp.size() <= 50
-          && (!data.keys().contains('status_disetujui') || data.status_disetujui is bool);
+          && (!data.keys().contains('status_disetujui') || data.status_disetujui is bool)
+          && (!data.keys().contains('selesai_at') || data.selesai_at is string);
     }
 
     // Match users
@@ -104,11 +105,15 @@ service cloud.firestore {
          && incoming().user_nama == existing().user_nama
          && incoming().user_whatsapp == existing().user_whatsapp
          && incoming().get('status_disetujui', false) == existing().get('status_disetujui', false)
-         && incoming().diff(existing()).affectedKeys().hasOnly(['status_selesai']))
+         && incoming().diff(existing()).affectedKeys().hasOnly(['status_selesai', 'selesai_at']))
         || isAdmin()
       );
       
-      allow delete: if isSignedIn() && (existing().id_user == request.auth.uid || isAdmin());
+      allow delete: if isSignedIn() && (
+        existing().id_user == request.auth.uid 
+        || isAdmin() 
+        || existing().status_selesai == true
+      );
     }
   }
 }

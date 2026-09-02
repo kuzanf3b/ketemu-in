@@ -1,7 +1,8 @@
 import React from 'react';
 import { Report } from '../types';
-import { MapPin, Calendar, Tag, CheckCircle2, Clock } from 'lucide-react';
+import { MapPin, Calendar, Tag, CheckCircle2, Clock, Hourglass } from 'lucide-react';
 import { motion } from 'motion/react';
+import { getAutoDeleteStatus } from '../lib/cleanupUtils';
 
 interface ReportCardProps {
   key?: React.Key;
@@ -12,6 +13,7 @@ interface ReportCardProps {
 export default function ReportCard({ report, onClick }: ReportCardProps) {
   const isLost = report.tipe_laporan === 'HILANG';
   const isSolved = report.status_selesai;
+  const autoDeleteInfo = getAutoDeleteStatus(report);
 
   const formatDate = (dateStr: string) => {
     try {
@@ -69,10 +71,14 @@ export default function ReportCard({ report, onClick }: ReportCardProps) {
         )}
 
         {isSolved && (
-          <div className="absolute inset-0 bg-background/60 backdrop-blur-xs flex items-center justify-center p-3">
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-xs flex flex-col items-center justify-center p-3 text-center gap-1.5">
             <div className="bg-[var(--chart-5)] text-foreground border border-border px-3 py-1.5 rounded-full flex items-center gap-1.5 font-semibold text-xs shadow-xs">
               <CheckCircle2 className="w-3.5 h-3.5" />
               SELESAI / KETEMU
+            </div>
+            <div className="bg-background/90 text-foreground border border-border px-2.5 py-0.5 rounded-full flex items-center gap-1 text-[10px] font-medium shadow-xs">
+              <Hourglass className="w-3 h-3 text-[var(--chart-1)]" />
+              <span>{autoDeleteInfo.formattedCountdown}</span>
             </div>
           </div>
         )}

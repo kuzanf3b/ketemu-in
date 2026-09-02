@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { Report, User } from '../types';
-import { X, MessageCircle, CheckCircle2, Calendar, MapPin, Tag, UserRound, Trash2, Clock } from 'lucide-react';
+import { X, MessageCircle, CheckCircle2, Calendar, MapPin, Tag, UserRound, Trash2, Clock, Hourglass } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getAutoDeleteStatus } from '../lib/cleanupUtils';
 import ConfirmModal from './ConfirmModal';
 
 interface ReportDetailProps {
   report: Report;
   currentUser: User | null;
   onClose: () => void;
-  onResolve: (id: string) => void;
+  onResolve: (id: string, selesaiAt?: string) => void;
   onDelete: (id: string) => void;
   onApprove?: (id: string) => void;
 }
@@ -31,6 +32,7 @@ export default function ReportDetail({
   const isOwner = currentUser?.id_user === report.id_user;
   const isAdmin = currentUser?.is_admin === true;
   const isSolved = report.status_selesai;
+  const autoDeleteInfo = getAutoDeleteStatus(report);
 
   const handleResolveClick = () => {
     if (!currentUser) return;
@@ -40,16 +42,18 @@ export default function ReportDetail({
   const executeResolve = async () => {
     setShowResolveConfirm(false);
     setLoading(true);
+    const nowIso = new Date().toISOString();
     try {
       try {
         await updateDoc(doc(db, 'reports', report.id_report), {
-          status_selesai: true
+          status_selesai: true,
+          selesai_at: nowIso
         });
       } catch (fsErr) {
         handleFirestoreError(fsErr, OperationType.UPDATE, `reports/${report.id_report}`);
       }
 
-      onResolve(report.id_report);
+      onResolve(report.id_report, nowIso);
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -225,13 +229,21 @@ export default function ReportDetail({
 
             {/* Solved Status Card */}
             {isSolved && (
-              <div className="p-3.5 sm:p-4 bg-accent border border-border rounded-[var(--radius)] flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="text-xs sm:text-sm font-semibold text-foreground">Laporan Selesai</h4>
-                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
-                    Barang atau temuan ini telah diserahkan kembali. Tombol kontak dinonaktifkan.
-                  </p>
+              <div className="p-3.5 sm:p-4 bg-accent border border-border rounded-[var(--radius)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-semibold text-foreground">Laporan Telah Selesai / Ketemu</h4>
+                    <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
+                      Barang atau temuan ini telah berhasil diselesaikan. Kontak WhatsApp dinonaktifkan.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 24-hour Auto-deletion countdown badge */}
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted border border-border text-[11px] font-medium text-foreground shrink-0 self-start sm:self-auto">
+                  <Hourglass className="w-3.5 h-3.5 text-[var(--chart-1)] animate-pulse" />
+                  <span>{autoDeleteInfo.formattedCountdown}</span>
                 </div>
               </div>
             )}
@@ -319,8 +331,8 @@ export default function ReportDetail({
       {/* Confirm Modals */}
       <ConfirmModal
         isOpen={showResolveConfirm}
-        title="Tandai Selesai"
-        message="Tandai laporan ini sebagai selesai dan arsipkan dari daftar aktif?"
+        title="Tandai Selesai / Ketemu"
+        message="Tandai laporan ini sebagai SELESAI / KETEMU? Laporan yang sudah selesai akan secara otomatis terhapus dari sistem setelah 24 jam."
         confirmText="Ya, Selesai"
         cancelText="Batal"
         onConfirm={executeResolve}

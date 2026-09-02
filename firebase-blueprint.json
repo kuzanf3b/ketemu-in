@@ -28,6 +28,7 @@
         "lokasi": { "type": "string", "maxLength": 200 },
         "tgl_kejadian": { "type": "string" },
         "status_selesai": { "type": "boolean" },
+        "selesai_at": { "type": "string" },
         "created_at": { "type": "string" },
         "user_nama": { "type": "string", "maxLength": 100 },
         "user_whatsapp": { "type": "string", "maxLength": 20 }
