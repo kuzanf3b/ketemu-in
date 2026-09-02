@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import logoBlack from '../assets/logo-black.png';
+import logoWhite from '../assets/logo-white.png';
 
 interface LandingPageProps {
   reports: Report[];
@@ -68,7 +69,12 @@ export default function LandingPage({
       <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-3.5 flex justify-between items-center">
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <img className="w-8 h-8 sm:w-9 sm:h-9 object-contain dark:invert" src={logoBlack} alt="KetemuIn Logo" referrerPolicy="no-referrer" />
+            <img
+              className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
+              src={isDark ? logoWhite : logoBlack}
+              alt="KetemuIn Logo"
+              referrerPolicy="no-referrer"
+            />
             <div>
               <h1 className="font-serif text-lg sm:text-xl font-semibold tracking-tight text-foreground leading-none">
                 KetemuIn
