@@ -17,8 +17,22 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [phoneWarning, setPhoneWarning] = useState('');
   const [loading, setLoading] = useState(false);
   const [isPetugas, setIsPetugas] = useState(false);
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    const sanitizedValue = rawValue.replace(/\D/g, '');
+
+    if (rawValue !== sanitizedValue) {
+      setPhoneWarning('Hanya angka yang diperbolehkan untuk nomor WhatsApp.');
+    } else {
+      setPhoneWarning('');
+    }
+
+    setNoWhatsapp(sanitizedValue);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +48,10 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
     const cleanedPhone = noWhatsapp.replace(/[^0-9]/g, '');
     if (cleanedPhone.length < 9) {
       setError('Nomor WhatsApp minimal 9 digit angka.');
+      setLoading(false);
+      return;
+    } else if (cleanedPhone.length > 15) {
+      setError('Nomor WhatsApp maksimal 15 digit angka.');
       setLoading(false);
       return;
     }
@@ -204,16 +222,22 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
               <input
                 id="login-whatsapp"
                 type="tel"
+                inputMode="numeric"
                 placeholder="08xxxxxxxxxx"
                 value={noWhatsapp}
-                onChange={(e) => setNoWhatsapp(e.target.value)}
+                onChange={handlePhoneChange}
+                maxLength={15}
                 className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground min-h-[42px]"
                 required
               />
             </div>
-            <p className="text-[11px] text-muted-foreground">
-              Digunakan untuk identifikasi akun dan kontak langsung dengan pelapor/penemu.
-            </p>
+            {phoneWarning ? (
+              <p className="text-[11px] text-amber-600 dark:text-amber-400">{phoneWarning}</p>
+            ) : (
+              <p className="text-[11px] text-muted-foreground">
+                Digunakan untuk identifikasi akun dan kontak langsung dengan pelapor/penemu.
+              </p>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -244,7 +268,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             </div>
           </div>
 
-          {!isLogin && (
+          {/*{!isLogin && (
             <div className="flex items-center gap-2 pt-1">
               <input
                 id="register-is-petugas"
@@ -258,7 +282,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                 Daftar sebagai Petugas RW 04
               </label>
             </div>
-          )}
+          )}*/}
 
           <button
             id="btn-auth-submit"
