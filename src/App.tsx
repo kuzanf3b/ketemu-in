@@ -310,28 +310,28 @@ export default function App() {
       <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 relative antialiased">
         <div className="w-full max-w-md flex justify-between items-center mb-4">
           <button
-            onclick={() => setViewState("landing")}
-            classname="min-h-[38px] px-3 py-1.5 bg-card hover:bg-muted text-foreground border border-border text-xs font-medium rounded-[var(--radius)] flex items-center gap-1.5 cursor-pointer shadow-xs"
+            onClick={() => setViewState("landing")}
+            className="min-h-[38px] px-3 py-1.5 bg-card hover:bg-muted text-foreground border border-border text-xs font-medium rounded-[var(--radius)] flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
-            <arrowleft classname="w-3.5 h-3.5" />
-            beranda
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Beranda
           </button>
-          <themetoggle isdark={isDark} ontoggle={toggleTheme} />
+          <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
         </div>
-        <loginregister onloginsuccess={handleLoginSuccess} />
+        <LoginRegister onLoginSuccess={handleLoginSuccess} />
       </div>
     );
   }
 
   return (
-    <div classname="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased">
-      {/* top navbar header */}
-      <header classname="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border transition-colors">
-        <div classname="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex justify-between items-center">
-          <div classname="flex items-center gap-2.5 sm:gap-3">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased">
+      {/* Top Navbar Header */}
+      <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border transition-colors">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex justify-between items-center">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <img
               className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
-              src={isDark ? logoBlack : logoWhite}
+              src={isDark ? logoWhite : logoBlack}
               alt="KetemuIn Logo"
               referrerPolicy="no-referrer"
             />
