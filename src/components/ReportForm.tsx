@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import { User, Category, TipeLaporan } from '../types';
 import { X, Upload, Camera, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
+import { collection, doc, setDoc } from 'firebase/firestore';
 
 interface ReportFormProps {
   currentUser: User;
@@ -117,10 +117,15 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
       const finalFotoUrl = fotoUrl || fallbackPlaceholder;
 
+      const reportDocRef = doc(collection(db, 'reports'));
+      const reportId = reportDocRef.id;
+      const currentAuthUid = auth.currentUser?.uid || currentUser.id_user;
+
       const newReportData = {
-        id_user: currentUser.id_user,
-        user_nama: currentUser.nama_lengkap,
-        user_whatsapp: currentUser.no_whatsapp,
+        id_report: reportId,
+        id_user: currentAuthUid,
+        user_nama: currentUser.nama_lengkap || 'Warga RW 04',
+        user_whatsapp: currentUser.no_whatsapp || '',
         tipe_laporan: tipeLaporan,
         judul: judul.trim(),
         deskripsi: deskripsi.trim(),
@@ -134,15 +139,24 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
       };
 
       try {
-        await addDoc(collection(db, 'reports'), newReportData);
+        await setDoc(reportDocRef, newReportData);
       } catch (fsErr) {
-        handleFirestoreError(fsErr, OperationType.CREATE, 'reports');
+        handleFirestoreError(fsErr, OperationType.CREATE, `reports/${reportId}`);
       }
 
       onSuccess();
     } catch (err: any) {
       console.error('Error creating report:', err);
-      setError(err.message || 'Gagal menyimpan laporan. Silakan coba lagi.');
+      let displayMessage = 'Gagal menyimpan laporan. Silakan periksa kembali formulir atau koneksi Anda.';
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed && parsed.error) {
+          displayMessage = parsed.error;
+        }
+      } catch {
+        if (err.message) displayMessage = err.message;
+      }
+      setError(displayMessage);
     } finally {
       setUploading(false);
     }

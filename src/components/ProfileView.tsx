@@ -56,7 +56,12 @@ export default function ProfileView({
 
       onResolve(report.id_report, nowIso);
     } catch (err: any) {
-      alert(err.message);
+      let msg = err.message || 'Gagal memperbarui status laporan.';
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed?.error) msg = parsed.error;
+      } catch {}
+      alert(msg);
     }
   };
 
@@ -79,7 +84,12 @@ export default function ProfileView({
 
       onDelete(report.id_report);
     } catch (err: any) {
-      alert(err.message);
+      let msg = err.message || 'Gagal menghapus laporan.';
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed?.error) msg = parsed.error;
+      } catch {}
+      alert(msg);
     }
   };
 

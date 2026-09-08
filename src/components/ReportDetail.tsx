@@ -55,7 +55,12 @@ export default function ReportDetail({
 
       onResolve(report.id_report, nowIso);
     } catch (err: any) {
-      alert(err.message);
+      let msg = err.message || 'Gagal menandai laporan sebagai selesai.';
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed?.error) msg = parsed.error;
+      } catch {}
+      alert(msg);
     } finally {
       setLoading(false);
     }
@@ -78,7 +83,12 @@ export default function ReportDetail({
 
       onDelete(report.id_report);
     } catch (err: any) {
-      alert(err.message);
+      let msg = err.message || 'Gagal menghapus laporan.';
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed?.error) msg = parsed.error;
+      } catch {}
+      alert(msg);
     } finally {
       setLoading(false);
     }
@@ -105,7 +115,12 @@ export default function ReportDetail({
         onApprove(report.id_report);
       }
     } catch (err: any) {
-      alert(err.message);
+      let msg = err.message || 'Gagal menyetujui laporan.';
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed?.error) msg = parsed.error;
+      } catch {}
+      alert(msg);
     } finally {
       setLoading(false);
     }

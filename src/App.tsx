@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { db, auth, handleFirestoreError, OperationType } from "./lib/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import {
   purgeExpiredResolvedReports,
@@ -100,11 +100,33 @@ export default function App() {
 
   // Sync with Firebase auth state
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         const saved = localStorage.getItem("ketemuin_user");
+        let userLoaded = false;
         if (saved) {
-          setCurrentUser(JSON.parse(saved));
+          try {
+            const parsed = JSON.parse(saved);
+            if (parsed && parsed.id_user === firebaseUser.uid) {
+              setCurrentUser(parsed);
+              userLoaded = true;
+            }
+          } catch (e) {
+            console.error("Error parsing stored user:", e);
+          }
+        }
+
+        if (!userLoaded) {
+          try {
+            const userSnap = await getDoc(doc(db, "users", firebaseUser.uid));
+            if (userSnap.exists()) {
+              const userData = userSnap.data() as User;
+              setCurrentUser(userData);
+              localStorage.setItem("ketemuin_user", JSON.stringify(userData));
+            }
+          } catch (err) {
+            console.error("Error fetching user data on auth change:", err);
+          }
         }
       } else {
         setCurrentUser(null);
@@ -695,7 +717,7 @@ export default function App() {
           />
         )}
 
-        {showAddModal && (
+        {showAddModal && currentUser && (
           <ReportForm
             currentUser={currentUser}
             onClose={() => setShowAddModal(false)}

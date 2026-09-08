@@ -128,7 +128,16 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
         onLoginSuccess(newUser);
       }
     } catch (err: any) {
-      setError(err.message);
+      let displayMessage = err.message || 'Terjadi kesalahan. Silakan coba lagi.';
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed && parsed.error) {
+          displayMessage = parsed.error;
+        }
+      } catch {
+        // Not JSON formatted
+      }
+      setError(displayMessage);
     } finally {
       setLoading(false);
     }
