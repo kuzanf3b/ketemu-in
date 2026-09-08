@@ -156,9 +156,11 @@ export default function ReportDetail({
       >
         {/* Unapproved Notice */}
         {report.status_disetujui === false && (
-          <div className="px-4 py-2 bg-accent border-b border-border text-foreground text-xs font-medium flex items-center gap-2">
-            <Clock className="w-4 h-4 shrink-0 text-[var(--chart-1)]" />
-            <span>Laporan menunggu persetujuan petugas RW 04 sebelum ditampilkan di papan publik.</span>
+          <div className="mx-4 sm:mx-6 mt-4 p-3 rounded-[var(--radius)] border border-warning bg-warning-background flex items-start gap-2.5">
+            <Clock className="w-4 h-4 shrink-0 text-warning mt-0.5" />
+            <p className="text-xs text-foreground leading-relaxed">
+              Laporan sedang dalam antrean review petugas RW 04 sebelum ditampilkan di papan pengumuman publik.
+            </p>
           </div>
         )}
 
@@ -244,19 +246,19 @@ export default function ReportDetail({
 
             {/* Solved Status Card */}
             {isSolved && (
-              <div className="p-3.5 sm:p-4 bg-accent border border-border rounded-[var(--radius)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="p-3.5 sm:p-4 bg-success-background border border-success rounded-[var(--radius)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
                   <div>
                     <h4 className="text-xs sm:text-sm font-semibold text-foreground">Laporan Telah Selesai / Ketemu</h4>
-                    <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
+                    <p className="text-[11px] sm:text-xs text-foreground/80 mt-0.5">
                       Barang atau temuan ini telah berhasil diselesaikan. Kontak WhatsApp dinonaktifkan.
                     </p>
                   </div>
                 </div>
 
                 {/* 24-hour Auto-deletion countdown badge */}
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted border border-border text-[11px] font-medium text-foreground shrink-0 self-start sm:self-auto">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background border border-border text-[11px] font-medium text-foreground shrink-0 self-start sm:self-auto shadow-xs">
                   <Hourglass className="w-3.5 h-3.5 text-[var(--chart-1)] animate-pulse" />
                   <span>{autoDeleteInfo.formattedCountdown}</span>
                 </div>

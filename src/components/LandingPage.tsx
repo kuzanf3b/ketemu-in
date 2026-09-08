@@ -10,7 +10,8 @@ import {
   AlertCircle,
   X,
   SlidersHorizontal,
-  Plus
+  Plus,
+  Info
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import logoBlack from '../assets/logo-black.png';
@@ -210,9 +211,9 @@ export default function LandingPage({
             </p>
           </div>
           
-          <div className="bg-card border border-border rounded-[var(--radius)] p-3 flex items-center gap-2.5 max-w-md">
-            <AlertCircle className="w-4 h-4 text-muted-foreground shrink-0" />
-            <p className="text-[11px] sm:text-xs text-muted-foreground">
+          <div className="flex items-start gap-2.5 rounded-[var(--radius)] border border-info bg-info-background p-3 max-w-md shadow-xs">
+            <Info className="w-4 h-4 text-info shrink-0 mt-0.5" />
+            <p className="text-[11px] sm:text-xs text-foreground leading-relaxed">
               Masuk atau buat akun untuk dapat menghubungi kontak pelapor langsung via WhatsApp.
             </p>
           </div>

@@ -57,8 +57,8 @@ export default function ConfirmModal({
               <div
                 className={`p-2.5 rounded-[var(--radius)] shrink-0 border ${
                   isDanger
-                    ? 'bg-destructive/10 text-destructive border-destructive/20'
-                    : 'bg-primary/10 text-primary border-primary/20'
+                    ? 'bg-error-background text-error border-error'
+                    : 'bg-success-background text-success border-success'
                 }`}
               >
                 {isDanger ? (
@@ -82,17 +82,17 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-3.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted bg-secondary rounded-[var(--radius)] border border-border transition-colors cursor-pointer"
+                className="px-3.5 py-1.5 text-xs font-medium text-secondary-foreground hover:bg-muted bg-secondary rounded-[var(--radius)] border border-border transition-colors cursor-pointer"
               >
                 {cancelText}
               </button>
               <button
                 type="button"
                 onClick={onConfirm}
-                className={`px-4 py-1.5 text-xs font-semibold text-white rounded-[var(--radius)] transition-opacity hover:opacity-90 shadow-xs cursor-pointer ${
+                className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius)] transition-opacity hover:opacity-90 shadow-xs cursor-pointer ${
                   isDanger
-                    ? 'bg-destructive'
-                    : 'bg-primary'
+                    ? 'bg-destructive text-destructive-foreground'
+                    : 'bg-primary text-primary-foreground'
                 }`}
               >
                 {confirmText}

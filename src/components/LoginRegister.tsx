@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../types';
-import { Eye, EyeOff, KeyRound, Phone, UserRound, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, KeyRound, Phone, UserRound, ArrowRight, AlertCircle, AlertTriangle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -191,16 +191,17 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           <motion.div
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-3 mb-4 text-xs font-medium text-destructive-foreground bg-destructive/90 rounded-[var(--radius)]"
+            className="flex items-start gap-2.5 rounded-[var(--radius)] border border-error bg-error-background p-3 mb-4 text-xs sm:text-sm text-foreground"
           >
-            {error}
+            <AlertCircle className="w-4 h-4 shrink-0 text-error mt-0.5" />
+            <p className="flex-1 leading-relaxed">{error}</p>
           </motion.div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div className="space-y-1.5">
-              <label htmlFor="register-name" className="text-xs font-semibold text-foreground block">
+              <label htmlFor="register-name" className="text-sm font-medium text-foreground block">
                 Nama Lengkap
               </label>
               <div className="relative">
@@ -210,10 +211,10 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                 <input
                   id="register-name"
                   type="text"
-                  placeholder="Nama sesuai KTP/warga"
+                  placeholder="Nama sesuai KTP / warga"
                   value={namaLengkap}
                   onChange={(e) => setNamaLengkap(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground min-h-[42px]"
+                  className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
                   required={!isLogin}
                 />
               </div>
@@ -221,7 +222,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           )}
 
           <div className="space-y-1.5">
-            <label htmlFor="login-whatsapp" className="text-xs font-semibold text-foreground block">
+            <label htmlFor="login-whatsapp" className="text-sm font-medium text-foreground block">
               Nomor WhatsApp
             </label>
             <div className="relative">
@@ -236,21 +237,24 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                 value={noWhatsapp}
                 onChange={handlePhoneChange}
                 maxLength={15}
-                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground min-h-[42px]"
+                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
                 required
               />
             </div>
             {phoneWarning ? (
-              <p className="text-[11px] text-amber-600 dark:text-amber-400">{phoneWarning}</p>
+              <div className="flex items-center gap-1.5 p-2 rounded-[var(--radius)] border border-warning bg-warning-background text-foreground text-[11px]">
+                <AlertTriangle className="w-3.5 h-3.5 text-warning shrink-0" />
+                <span>{phoneWarning}</span>
+              </div>
             ) : (
               <p className="text-[11px] text-muted-foreground">
-                Digunakan untuk identifikasi akun dan kontak langsung dengan pelapor/penemu.
+                Digunakan untuk verifikasi akun dan menghubungkan kontak antar warga.
               </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="login-password" className="text-xs font-semibold text-foreground block">
+            <label htmlFor="login-password" className="text-sm font-medium text-foreground block">
               Kata Sandi
             </label>
             <div className="relative">
@@ -263,7 +267,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                 placeholder="Minimal 6 karakter"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-9 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring transition-colors text-foreground min-h-[42px]"
+                className="w-full pl-9 pr-9 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
                 required
               />
               <button

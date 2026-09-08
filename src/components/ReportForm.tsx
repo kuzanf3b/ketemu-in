@@ -189,15 +189,15 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
           {error && (
-            <div className="p-3 text-xs font-medium text-destructive-foreground bg-destructive/90 rounded-[var(--radius)] flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
+            <div className="flex items-start gap-2.5 rounded-[var(--radius)] border border-error bg-error-background p-3 text-xs sm:text-sm text-foreground">
+              <AlertCircle className="w-4 h-4 shrink-0 text-error mt-0.5" />
+              <p className="flex-1 leading-relaxed">{error}</p>
             </div>
           )}
 
           {/* Tipe Laporan Toggle */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground block">Tipe Laporan</label>
+            <label className="text-sm font-medium text-foreground block">Tipe Laporan</label>
             <div className="grid grid-cols-2 gap-1.5 bg-muted p-1 rounded-[var(--radius)] border border-border">
               <button
                 type="button"
@@ -228,8 +228,8 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
           {/* Image Upload Area */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground block">
-              Foto Barang <span className="text-muted-foreground font-normal">(Opsional)</span>
+            <label className="text-sm font-medium text-foreground block">
+              Foto Barang <span className="text-muted-foreground font-normal text-xs">(Opsional)</span>
             </label>
             
             <input
@@ -261,7 +261,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-border rounded-[var(--radius)] p-5 text-center cursor-pointer hover:border-foreground/40 hover:bg-muted/30 transition-colors flex flex-col items-center justify-center gap-1.5"
+                className="border-2 border-dashed border-muted rounded-[var(--radius)] p-5 text-center cursor-pointer hover:border-foreground/40 hover:bg-muted/30 transition-colors flex flex-col items-center justify-center gap-1.5"
               >
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                   <Camera className="w-5 h-5" />
@@ -278,7 +278,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
           {/* Judul Barang */}
           <div className="space-y-1.5">
-            <label htmlFor="form-input-judul" className="text-xs font-semibold text-foreground block">
+            <label htmlFor="form-input-judul" className="text-sm font-medium text-foreground block">
               Nama Barang <span className="text-[var(--chart-1)]">*</span>
             </label>
             <input
@@ -295,7 +295,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
           {/* Kategori & Tanggal (Responsive grid) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label htmlFor="form-select-kategori" className="text-xs font-semibold text-foreground block">
+              <label htmlFor="form-select-kategori" className="text-sm font-medium text-foreground block">
                 Kategori <span className="text-[var(--chart-1)]">*</span>
               </label>
               <select
@@ -311,7 +311,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="form-input-tanggal" className="text-xs font-semibold text-foreground block">
+              <label htmlFor="form-input-tanggal" className="text-sm font-medium text-foreground block">
                 Tanggal Kejadian <span className="text-[var(--chart-1)]">*</span>
               </label>
               <input
@@ -327,7 +327,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
           {/* Lokasi */}
           <div className="space-y-1.5">
-            <label htmlFor="form-input-lokasi" className="text-xs font-semibold text-foreground block">
+            <label htmlFor="form-input-lokasi" className="text-sm font-medium text-foreground block">
               Perkiraan Lokasi <span className="text-[var(--chart-1)]">*</span>
             </label>
             <input
@@ -343,7 +343,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
 
           {/* Deskripsi */}
           <div className="space-y-1.5">
-            <label htmlFor="form-input-deskripsi" className="text-xs font-semibold text-foreground block">
+            <label htmlFor="form-input-deskripsi" className="text-sm font-medium text-foreground block">
               Deskripsi & Ciri Khusus <span className="text-[var(--chart-1)]">*</span>
             </label>
             <textarea
@@ -371,7 +371,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 sm:flex-initial min-h-[42px] px-4 py-2 text-xs font-medium text-foreground hover:bg-muted rounded-[var(--radius)] border border-border transition-colors cursor-pointer"
+              className="flex-1 sm:flex-initial min-h-[42px] px-4 py-2 text-xs font-medium text-secondary-foreground bg-secondary hover:bg-muted rounded-[var(--radius)] border border-border transition-colors cursor-pointer"
             >
               Batal
             </button>

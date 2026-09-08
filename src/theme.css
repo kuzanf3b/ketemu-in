@@ -40,6 +40,20 @@
   --shadow-offset-y: 4px;
   --shadow-blur: 10px;
   --shadow-opacity: 0.1;
+
+  /* Semantic Status Tokens (Light Mode) */
+  --success: #4B7B4E;
+  --success-foreground: #FFFFFF;
+  --success-background: #DEE8D7;
+  --warning: #B8862E;
+  --warning-foreground: #1E1E1E;
+  --warning-background: #F3E4C0;
+  --info: #3B6E91;
+  --info-foreground: #FFFFFF;
+  --info-background: #DCE8F0;
+  --error: var(--destructive);
+  --error-foreground: var(--destructive-foreground);
+  --error-background: #F8D7D5;
 }
 
 .dark {
@@ -81,9 +95,23 @@
   --shadow-offset-y: 6px;
   --shadow-blur: 15px;
   --shadow-opacity: 0.3;
+
+  /* Semantic Status Tokens (Dark Mode) */
+  --success: #7BAE7E;
+  --success-foreground: #10210F;
+  --success-background: #1C2A1B;
+  --warning: #D9A544;
+  --warning-foreground: #241A05;
+  --warning-background: #2E2712;
+  --info: #6FA8CC;
+  --info-foreground: #0D1B24;
+  --info-background: #1B2A33;
+  --error: var(--destructive);
+  --error-foreground: var(--destructive-foreground);
+  --error-background: #341414;
 }
 
-@theme {
+@theme inline {
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -122,6 +150,19 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-background: var(--success-background);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-background: var(--warning-background);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-background: var(--info-background);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-error-background: var(--error-background);
 
   --radius: var(--radius);
 }
