@@ -1,71 +1,65 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Global Safety Net
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // Primitive Helpers
+    // Helper Functions
     function isSignedIn() {
       return request.auth != null;
     }
     
-    function isValidId(id) {
-      return id is string && id.size() > 0 && id.size() <= 128;
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'fauzn88br@gmail.com' ||
+        request.auth.token.email == 'admin@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.is_admin == true)
+      );
     }
 
-    function incoming() {
-      return request.resource.data;
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
     }
 
     function existing() {
       return resource.data;
     }
 
-    // Helper to check if user is an admin
-    function isAdmin() {
-      return isSignedIn() && (
-        (request.auth.token.email == 'fauzn88br@gmail.com') ||
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-         'is_admin' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data &&
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.is_admin == true)
-      );
+    function incoming() {
+      return request.resource.data;
     }
 
     // 1. User Entity Validation
     function isValidUser(data) {
-      return data.keys().hasAll(['id_user', 'nama_lengkap', 'no_whatsapp', 'created_at'])
-          && data.keys().size() <= 6
-          && data.id_user is string && data.id_user.size() <= 128
+      return data.keys().hasAll(['nama_lengkap', 'no_whatsapp', 'rt_rw'])
+          && data.keys().size() <= 10
           && data.nama_lengkap is string && data.nama_lengkap.size() >= 1 && data.nama_lengkap.size() <= 100
-          && data.no_whatsapp is string && data.no_whatsapp.size() >= 9 && data.no_whatsapp.size() <= 20
-          && data.created_at is string
+          && data.no_whatsapp is string && data.no_whatsapp.size() >= 8 && data.no_whatsapp.size() <= 20
+          && data.rt_rw is string && data.rt_rw.size() >= 1 && data.rt_rw.size() <= 30
+          && (!('id_user' in data) || (data.id_user is string && data.id_user.size() <= 128))
+          && (!('email' in data) || (data.email is string && data.email.size() <= 120))
+          && (!('foto_profil' in data) || data.foto_profil is string)
+          && (!('created_at' in data) || data.created_at is string)
           && (!('is_admin' in data) || data.is_admin is bool);
     }
 
     // 2. Report Entity Validation
     function isValidReport(data) {
-      return data.keys().hasAll([
-            'id_user', 'tipe_laporan', 'kategori', 'judul', 
-            'deskripsi', 'lokasi', 'tgl_kejadian', 'status_selesai', 
-            'created_at', 'user_nama', 'user_whatsapp', 'foto_url'
-          ])
-          && data.keys().size() <= 20
-          && (!('id_report' in data) || (data.id_report is string && data.id_report.size() <= 128))
+      return data.keys().hasAll(['id_user', 'tipe_laporan', 'kategori', 'judul', 'deskripsi', 'lokasi', 'tgl_kejadian', 'status_selesai'])
+          && data.keys().size() <= 16
           && data.id_user is string && data.id_user.size() <= 128
-          && (data.tipe_laporan == 'HILANG' || data.tipe_laporan == 'DITEMUKAN')
-          && data.kategori is string && data.kategori.size() <= 100
-          && data.judul is string && data.judul.size() >= 1 && data.judul.size() <= 300
-          && data.deskripsi is string
-          && data.foto_url is string
-          && data.lokasi is string && data.lokasi.size() <= 1000
-          && data.tgl_kejadian is string
+          && data.tipe_laporan in ['HILANG', 'DITEMUKAN']
+          && data.kategori is string && data.kategori.size() >= 1 && data.kategori.size() <= 50
+          && data.judul is string && data.judul.size() >= 3 && data.judul.size() <= 150
+          && data.deskripsi is string && data.deskripsi.size() >= 3 && data.deskripsi.size() <= 2000
+          && data.lokasi is string && data.lokasi.size() >= 2 && data.lokasi.size() <= 200
+          && data.tgl_kejadian is string && data.tgl_kejadian.size() <= 30
           && data.status_selesai is bool
-          && data.created_at is string
-          && data.user_nama is string && data.user_nama.size() <= 200
-          && data.user_whatsapp is string && data.user_whatsapp.size() <= 50
+          && (!('id_report' in data) || (data.id_report is string && data.id_report.size() <= 128))
+          && (!('foto_url' in data) || data.foto_url is string)
+          && (!('created_at' in data) || data.created_at is string)
+          && (!('user_nama' in data) || (data.user_nama is string && data.user_nama.size() <= 100))
+          && (!('user_whatsapp' in data) || (data.user_whatsapp is string && data.user_whatsapp.size() <= 30))
           && (!('status_disetujui' in data) || data.status_disetujui is bool)
           && (!('selesai_at' in data) || data.selesai_at is string);
     }
@@ -83,10 +77,15 @@ service cloud.firestore {
     // Match users
     match /users/{userId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn() && userId == request.auth.uid && isValidUser(incoming());
+      allow create: if isSignedIn() 
+                    && request.auth.uid == userId
+                    && isValidUser(incoming())
+                    && (!('is_admin' in incoming()) || incoming().is_admin == false || isAdmin());
       allow update: if isSignedIn() && (
-        (userId == request.auth.uid && isValidUser(incoming()) && 
-         ((!('is_admin' in incoming()) && !('is_admin' in existing())) || 
+        (request.auth.uid == userId && 
+         isValidUser(incoming()) && 
+         (!('is_admin' in incoming()) || 
+          !('is_admin' in existing()) || 
           (incoming().is_admin == existing().is_admin))) ||
         isAdmin()
       );
@@ -106,7 +105,7 @@ service cloud.firestore {
                     && (!('status_disetujui' in incoming()) || incoming().status_disetujui == false || isAdmin());
                     
       allow update: if isSignedIn() && (
-        // Action: Resolve/Finish (Owner can mark their report as resolved)
+        // Action: Resolve/Finish (ONLY the Owner who created the report can mark it as resolved)
         (existing().id_user == request.auth.uid 
          && isValidReport(incoming())
          && incoming().id_user == existing().id_user
@@ -123,7 +122,13 @@ service cloud.firestore {
          && ((!('status_disetujui' in incoming()) && !('status_disetujui' in existing())) || 
              (incoming().status_disetujui == existing().status_disetujui))
          && incoming().diff(existing()).affectedKeys().hasOnly(['status_selesai', 'selesai_at']))
-        || isAdmin()
+        || 
+        // Action: Admin updates (e.g. approval status_disetujui, or batch category update)
+        // Petugas CANNOT change status_selesai on reports submitted by other users!
+        (isAdmin() && (
+          existing().id_user == request.auth.uid ||
+          incoming().status_selesai == existing().status_selesai
+        ))
       );
       
       allow delete: if isSignedIn() && (

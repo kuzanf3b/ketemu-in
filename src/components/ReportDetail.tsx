@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Report, User } from '../types';
-import { X, MessageCircle, CheckCircle2, Calendar, MapPin, Tag, UserRound, Trash2, Clock, Hourglass } from 'lucide-react';
+import { X, MessageCircle, CheckCircle2, Calendar, MapPin, Tag, UserRound, Trash2, Clock, Hourglass, Info } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
@@ -40,11 +40,12 @@ export default function ReportDetail({
   const autoDeleteInfo = getAutoDeleteStatus(report);
 
   const handleResolveClick = () => {
-    if (!currentUser) return;
+    if (!currentUser || !isOwner) return;
     setShowResolveConfirm(true);
   };
 
   const executeResolve = async () => {
+    if (!isOwner) return;
     setShowResolveConfirm(false);
     setLoading(true);
     const nowIso = new Date().toISOString();
@@ -295,6 +296,15 @@ export default function ReportDetail({
                 </div>
               </div>
             )}
+            {/* Informative notice for Petugas: cannot resolve citizen report */}
+            {isAdmin && !isOwner && !isSolved && (
+              <div className="p-3.5 bg-muted/60 border border-border rounded-[var(--radius)] flex items-center gap-2.5 text-xs text-muted-foreground">
+                <Info className="w-4 h-4 text-primary shrink-0" />
+                <span>
+                  Laporan ini milik warga. Tombol <strong>Selesai</strong> hanya dapat dikonfirmasi oleh pemilik laporan setelah barang kembali/ditemukan.
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -313,7 +323,7 @@ export default function ReportDetail({
               </button>
             )}
 
-            {(isOwner || isAdmin) && !isSolved && (
+            {isOwner && !isSolved && (
               <button
                 id="btn-resolve-report"
                 onClick={handleResolveClick}
