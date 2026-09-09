@@ -74,6 +74,33 @@ service cloud.firestore {
           && (!('updated_at' in data) || data.updated_at is string);
     }
 
+    // 4. Archived Report Entity Validation
+    function isValidArchivedReport(data) {
+      return data.keys().hasAll(['id_report', 'id_user', 'tipe_laporan', 'judul', 'deleted_at', 'deleted_by_name', 'deleted_by_role', 'delete_reason'])
+          && data.keys().size() <= 24
+          && data.id_report is string && data.id_report.size() <= 128
+          && data.id_user is string && data.id_user.size() <= 128
+          && data.tipe_laporan in ['HILANG', 'DITEMUKAN']
+          && data.judul is string && data.judul.size() >= 1 && data.judul.size() <= 150
+          && data.deleted_at is string
+          && data.deleted_by_name is string && data.deleted_by_name.size() <= 100
+          && data.deleted_by_role in ['petugas', 'warga', 'sistem']
+          && data.delete_reason is string && data.delete_reason.size() <= 250
+          && (!('id_archive' in data) || (data.id_archive is string && data.id_archive.size() <= 128))
+          && (!('kategori' in data) || data.kategori is string)
+          && (!('deskripsi' in data) || data.deskripsi is string)
+          && (!('foto_url' in data) || data.foto_url is string)
+          && (!('lokasi' in data) || data.lokasi is string)
+          && (!('tgl_kejadian' in data) || data.tgl_kejadian is string)
+          && (!('status_selesai' in data) || data.status_selesai is bool)
+          && (!('selesai_at' in data) || data.selesai_at is string)
+          && (!('created_at' in data) || data.created_at is string)
+          && (!('user_nama' in data) || data.user_nama is string)
+          && (!('user_whatsapp' in data) || data.user_whatsapp is string)
+          && (!('status_disetujui' in data) || data.status_disetujui is bool)
+          && (!('deleted_by_uid' in data) || data.deleted_by_uid is string);
+    }
+
     // Match users
     match /users/{userId} {
       allow read: if isSignedIn();
@@ -144,6 +171,15 @@ service cloud.firestore {
       allow list: if true;
       allow create: if isAdmin() && isValidCategory(incoming());
       allow update: if isAdmin() && isValidCategory(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Match archived_reports (Only accessible by Petugas / Admin for history & audit)
+    match /archived_reports/{archiveId} {
+      allow get: if isAdmin();
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && isValidArchivedReport(incoming());
+      allow update: if isAdmin() && isValidArchivedReport(incoming());
       allow delete: if isAdmin();
     }
   }

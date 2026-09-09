@@ -3,8 +3,9 @@ import { Report, User } from '../types';
 import { Phone, CheckCircle2, LogOut, Trash2, Calendar, MapPin, Tag, Hourglass } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { getAutoDeleteStatus } from '../lib/cleanupUtils';
+import { archiveAndDeleteReport } from '../lib/reportArchive';
 import ConfirmModal from './ConfirmModal';
 
 interface ProfileViewProps {
@@ -76,11 +77,15 @@ export default function ProfileView({
     setPendingDeleteReport(null);
 
     try {
-      try {
-        await deleteDoc(doc(db, 'reports', report.id_report));
-      } catch (fsErr) {
-        handleFirestoreError(fsErr, OperationType.DELETE, `reports/${report.id_report}`);
-      }
+      const isOfficer = currentUser.is_admin === true;
+      await archiveAndDeleteReport(report, {
+        deletedByUid: currentUser.id_user,
+        deletedByName: currentUser.nama_lengkap || 'Warga',
+        deletedByRole: isOfficer ? 'petugas' : 'warga',
+        deleteReason: isOfficer 
+          ? 'Dihapus secara manual oleh Petugas RW'
+          : 'Dihapus secara manual oleh Pemilik Laporan (Warga)'
+      });
 
       onDelete(report.id_report);
     } catch (err: any) {

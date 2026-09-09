@@ -3,8 +3,9 @@ import { Report, User } from '../types';
 import { X, MessageCircle, CheckCircle2, Calendar, MapPin, Tag, UserRound, Trash2, Clock, Hourglass, Info } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { getAutoDeleteStatus } from '../lib/cleanupUtils';
+import { archiveAndDeleteReport } from '../lib/reportArchive';
 import ConfirmModal from './ConfirmModal';
 
 interface ReportDetailProps {
@@ -81,11 +82,21 @@ export default function ReportDetail({
     setShowDeleteConfirm(false);
     setLoading(true);
     try {
-      try {
-        await deleteDoc(doc(db, 'reports', report.id_report));
-      } catch (fsErr) {
-        handleFirestoreError(fsErr, OperationType.DELETE, `reports/${report.id_report}`);
-      }
+      const isOfficer = currentUser?.is_admin === true;
+      const isRejection = isOfficer && report.status_disetujui === false;
+      
+      const reason = isRejection 
+        ? 'Laporan ditolak / tidak disetujui oleh Petugas RW'
+        : isOfficer 
+          ? 'Dihapus secara manual oleh Petugas RW'
+          : 'Dihapus secara manual oleh Pemilik Laporan (Warga)';
+
+      await archiveAndDeleteReport(report, {
+        deletedByUid: currentUser?.id_user || 'unknown',
+        deletedByName: currentUser?.nama_lengkap || (isOfficer ? 'Petugas RW' : 'Warga'),
+        deletedByRole: isOfficer ? 'petugas' : 'warga',
+        deleteReason: reason
+      });
 
       onDelete(report.id_report);
     } catch (err: any) {

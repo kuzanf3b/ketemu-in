@@ -46,6 +46,34 @@
         "updated_at": { "type": "string" }
       },
       "required": ["id_kategori", "nama"]
+    },
+    "ArchivedReport": {
+      "title": "ArchivedReport",
+      "description": "Archived history of deleted and purged reports for officer audit",
+      "type": "object",
+      "properties": {
+        "id_archive": { "type": "string", "maxLength": 128 },
+        "id_report": { "type": "string", "maxLength": 128 },
+        "id_user": { "type": "string", "maxLength": 128 },
+        "tipe_laporan": { "type": "string", "enum": ["HILANG", "DITEMUKAN"] },
+        "kategori": { "type": "string", "maxLength": 50 },
+        "judul": { "type": "string", "maxLength": 150 },
+        "deskripsi": { "type": "string", "maxLength": 2000 },
+        "foto_url": { "type": "string", "maxLength": 1000000 },
+        "lokasi": { "type": "string", "maxLength": 200 },
+        "tgl_kejadian": { "type": "string" },
+        "status_selesai": { "type": "boolean" },
+        "selesai_at": { "type": "string" },
+        "created_at": { "type": "string" },
+        "user_nama": { "type": "string", "maxLength": 100 },
+        "user_whatsapp": { "type": "string", "maxLength": 30 },
+        "deleted_at": { "type": "string" },
+        "deleted_by_uid": { "type": "string", "maxLength": 128 },
+        "deleted_by_name": { "type": "string", "maxLength": 100 },
+        "deleted_by_role": { "type": "string", "enum": ["petugas", "warga", "sistem"] },
+        "delete_reason": { "type": "string", "maxLength": 250 }
+      },
+      "required": ["id_report", "id_user", "tipe_laporan", "judul", "deleted_at", "deleted_by_name", "deleted_by_role", "delete_reason"]
     }
   },
   "firestore": {
@@ -60,6 +88,10 @@
     "categories/{categoryId}": {
       "schema": "Category",
       "description": "Collection of lost & found categories managed by petugas"
+    },
+    "archived_reports/{archiveId}": {
+      "schema": "ArchivedReport",
+      "description": "Audit archive of deleted reports accessible exclusively by petugas"
     }
   }
 }

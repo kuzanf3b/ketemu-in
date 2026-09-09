@@ -6,6 +6,7 @@ import ReportDetail from "./components/ReportDetail";
 import ReportForm from "./components/ReportForm";
 import ProfileView from "./components/ProfileView";
 import CategoryManagement from "./components/CategoryManagement";
+import OfficerHistoryView from "./components/OfficerHistoryView";
 import LandingPage from "./components/LandingPage";
 import ThemeToggle from "./components/ThemeToggle";
 import {
@@ -18,6 +19,8 @@ import {
   ArrowLeft,
   X,
   Tag,
+  History,
+  Archive,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { db, auth, handleFirestoreError, OperationType } from "./lib/firebase";
@@ -61,7 +64,7 @@ export default function App() {
   const [viewState, setViewState] = useState<"landing" | "login">("landing");
 
   const [currentTab, setCurrentTab] = useState<
-    "home" | "profile" | "approval" | "categories"
+    "home" | "profile" | "approval" | "categories" | "history"
   >("home");
   const [reports, setReports] = useState<Report[]>([]);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
@@ -461,6 +464,21 @@ export default function App() {
                 </button>
               )}
 
+              {currentUser?.is_admin && (
+                <button
+                  id="nav-btn-history"
+                  onClick={() => setCurrentTab("history")}
+                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+                    currentTab === "history"
+                      ? "bg-card text-foreground font-semibold shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <History className="w-3.5 h-3.5" />
+                  <span>Riwayat</span>
+                </button>
+              )}
+
               <button
                 id="nav-btn-profile"
                 onClick={() => setCurrentTab("profile")}
@@ -489,7 +507,13 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 pb-28 sm:pb-20">
-        {currentTab === "categories" && currentUser?.is_admin ? (
+        {currentTab === "history" && currentUser?.is_admin ? (
+          <OfficerHistoryView
+            currentUser={currentUser}
+            activeReports={reports}
+            onRefreshActiveReports={fetchReports}
+          />
+        ) : currentTab === "categories" && currentUser?.is_admin ? (
           <CategoryManagement
             currentUser={currentUser}
             categories={categories}
@@ -773,6 +797,21 @@ export default function App() {
           >
             <Tag className="w-5 h-5 mb-0.5" />
             <span className="text-[10px]">Kategori</span>
+          </button>
+        )}
+
+        {currentUser?.is_admin && (
+          <button
+            id="mobile-nav-btn-history"
+            onClick={() => setCurrentTab("history")}
+            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
+              currentTab === "history"
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground"
+            }`}
+          >
+            <History className="w-5 h-5 mb-0.5" />
+            <span className="text-[10px]">Riwayat</span>
           </button>
         )}
 

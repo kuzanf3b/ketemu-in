@@ -1,6 +1,6 @@
 import { Report } from '../types';
-import { db, auth, handleFirestoreError, OperationType } from './firebase';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { auth } from './firebase';
+import { archiveAndDeleteReport } from './reportArchive';
 
 export const AUTO_DELETE_HOURS = 24;
 export const AUTO_DELETE_MS = AUTO_DELETE_HOURS * 60 * 60 * 1000;
@@ -88,7 +88,12 @@ export async function purgeExpiredResolvedReports(reports: Report[]): Promise<st
 
   for (const report of expiredReports) {
     try {
-      await deleteDoc(doc(db, 'reports', report.id_report));
+      await archiveAndDeleteReport(report, {
+        deletedByUid: auth.currentUser.uid,
+        deletedByName: auth.currentUser.displayName || 'Sistem Pembersihan Otomatis',
+        deletedByRole: 'sistem',
+        deleteReason: 'Otomatis diarsipkan & dihapus dari feed setelah 24 jam status selesai'
+      });
       deletedIds.push(report.id_report);
     } catch (err) {
       // Background cleanup should silently catch if not authorized or network fails
