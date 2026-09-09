@@ -159,13 +159,30 @@ export default function ReportDetail({
         transition={{ duration: 0.15 }}
         className="relative bg-card text-card-foreground w-full max-w-2xl rounded-t-[1rem] sm:rounded-[var(--radius)] overflow-hidden shadow-2xl border border-border max-h-[92vh] sm:max-h-[90vh] flex flex-col"
       >
-        {/* Unapproved Notice */}
+        {/* Unapproved Status Notification Banner */}
         {report.status_disetujui === false && (
-          <div className="sm:mx-6 mt-4 p-3 rounded-[var(--radius)] border border-warning bg-warning-background flex items-start gap-2.5">
-            <Clock className="w-4 h-4 shrink-0 text-warning mt-0.5" />
-            <p className="text-xs text-foreground leading-relaxed">
-              Laporan sedang dalam antrean review petugas RW 04 sebelum ditampilkan di papan pengumuman publik.
-            </p>
+          <div
+            id="unapproved-notice-banner"
+            className="w-full bg-warning-background/95 text-foreground border-b border-warning/35 px-4 sm:px-5 py-2.5 sm:py-3 pr-14 sm:pr-16 flex items-center gap-3 shrink-0"
+          >
+            <div className="w-8 h-8 rounded-full bg-warning/20 border border-warning/30 flex items-center justify-center shrink-0 text-warning">
+              <Clock className="w-4 h-4 animate-pulse" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-semibold text-xs sm:text-sm text-foreground tracking-tight">
+                  {isAdmin ? 'Menunggu Persetujuan Petugas' : 'Menunggu Persetujuan Petugas'}
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-warning/25 text-warning border border-warning/30 uppercase tracking-wider">
+                  Review RW 04
+                </span>
+              </div>
+              <p className="text-[11px] sm:text-xs text-muted-foreground leading-snug mt-0.5">
+                {isAdmin
+                  ? 'Laporan ini memerlukan persetujuan sebelum dipublikasikan ke papan pengumuman.'
+                  : 'Laporan ini dalam antrean peninjauan petugas sebelum dipublikasikan ke publik.'}
+              </p>
+            </div>
           </div>
         )}
 
@@ -173,7 +190,9 @@ export default function ReportDetail({
         <button
           onClick={onClose}
           aria-label="Tutup detail laporan"
-          className="absolute top-3 right-3 z-20 p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-full sm:rounded-[var(--radius)] bg-background/85 hover:bg-destructive text-foreground border border-border transition-colors cursor-pointer shadow-xs"
+          className={`absolute z-20 p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-full sm:rounded-[var(--radius)] bg-background/85 hover:bg-muted text-foreground border border-border transition-colors cursor-pointer shadow-xs ${
+            report.status_disetujui === false ? 'top-2 right-2.5 sm:top-2.5 sm:right-3' : 'top-3 right-3'
+          }`}
         >
           <X className="w-4 h-4" />
         </button>
