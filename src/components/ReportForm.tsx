@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { User, Category, TipeLaporan } from '../types';
+import { User, Category, TipeLaporan, DEFAULT_CATEGORIES } from '../types';
 import { X, Upload, Camera, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
@@ -9,15 +9,15 @@ interface ReportFormProps {
   currentUser: User;
   onClose: () => void;
   onSuccess: () => void;
+  availableCategories?: string[];
 }
 
-const CATEGORIES: Category[] = ['Elektronik', 'Kunci', 'Dompet', 'Hewan', 'Dokumen', 'Lainnya'];
-
-export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFormProps) {
+export default function ReportForm({ currentUser, onClose, onSuccess, availableCategories }: ReportFormProps) {
+  const categoryList = availableCategories && availableCategories.length > 0 ? availableCategories : DEFAULT_CATEGORIES;
   const [tipeLaporan, setTipeLaporan] = useState<TipeLaporan>('HILANG');
   const [judul, setJudul] = useState('');
   const [deskripsi, setDeskripsi] = useState('');
-  const [kategori, setKategori] = useState<Category>('Elektronik');
+  const [kategori, setKategori] = useState<string>(() => categoryList[0] || 'Elektronik');
   const [lokasi, setLokasi] = useState('');
   const [tglKejadian, setTglKejadian] = useState(() => new Date().toISOString().split('T')[0]);
   
@@ -301,10 +301,10 @@ export default function ReportForm({ currentUser, onClose, onSuccess }: ReportFo
               <select
                 id="form-select-kategori"
                 value={kategori}
-                onChange={(e) => setKategori(e.target.value as Category)}
+                onChange={(e) => setKategori(e.target.value)}
                 className="w-full px-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
               >
-                {CATEGORIES.map((cat) => (
+                {categoryList.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>

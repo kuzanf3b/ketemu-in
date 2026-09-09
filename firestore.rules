@@ -70,6 +70,16 @@ service cloud.firestore {
           && (!('selesai_at' in data) || data.selesai_at is string);
     }
 
+    // 3. Category Entity Validation
+    function isValidCategory(data) {
+      return data.keys().hasAll(['nama'])
+          && data.keys().size() <= 6
+          && data.nama is string && data.nama.size() >= 1 && data.nama.size() <= 50
+          && (!('id_kategori' in data) || (data.id_kategori is string && data.id_kategori.size() <= 128))
+          && (!('created_at' in data) || data.created_at is string)
+          && (!('updated_at' in data) || data.updated_at is string);
+    }
+
     // Match users
     match /users/{userId} {
       allow read: if isSignedIn();
@@ -121,6 +131,15 @@ service cloud.firestore {
         || isAdmin() 
         || existing().status_selesai == true
       );
+    }
+
+    // Match categories (Managed by Petugas / Admin)
+    match /categories/{categoryId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isAdmin() && isValidCategory(incoming());
+      allow update: if isAdmin() && isValidCategory(incoming());
+      allow delete: if isAdmin();
     }
   }
 }

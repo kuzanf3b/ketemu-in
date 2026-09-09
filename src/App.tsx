@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { User, Report, Category } from "./types";
+import { User, Report, Category, CategoryItem, DEFAULT_CATEGORIES } from "./types";
 import LoginRegister from "./components/LoginRegister";
 import ReportCard from "./components/ReportCard";
 import ReportDetail from "./components/ReportDetail";
 import ReportForm from "./components/ReportForm";
 import ProfileView from "./components/ProfileView";
+import CategoryManagement from "./components/CategoryManagement";
 import LandingPage from "./components/LandingPage";
 import ThemeToggle from "./components/ThemeToggle";
 import {
@@ -16,6 +17,7 @@ import {
   CheckCircle2,
   ArrowLeft,
   X,
+  Tag,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { db, auth, handleFirestoreError, OperationType } from "./lib/firebase";
@@ -27,16 +29,6 @@ import {
 } from "./lib/cleanupUtils";
 import logoBlack from "./assets/logo-black.png";
 import logoWhite from "./assets/logo-white.png";
-
-const CATEGORIES: ("Semua" | Category)[] = [
-  "Semua",
-  "Elektronik",
-  "Kunci",
-  "Dompet",
-  "Hewan",
-  "Dokumen",
-  "Lainnya",
-];
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -68,15 +60,63 @@ export default function App() {
 
   const [viewState, setViewState] = useState<"landing" | "login">("landing");
 
-  const [currentTab, setCurrentTab] = useState<"home" | "profile" | "approval">(
-    "home",
-  );
+  const [currentTab, setCurrentTab] = useState<
+    "home" | "profile" | "approval" | "categories"
+  >("home");
   const [reports, setReports] = useState<Report[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [categoryNames, setCategoryNames] = useState<string[]>(DEFAULT_CATEGORIES);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
   const [selectedTipe, setSelectedTipe] = useState<string>("Semua");
   const [authInitialized, setAuthInitialized] = useState(false);
+
+  // Fetch dynamic categories from Firestore
+  const fetchCategories = useCallback(async () => {
+    try {
+      const catRef = collection(db, "categories");
+      const catSnap = await getDocs(catRef);
+      if (!catSnap.empty) {
+        const loaded: CategoryItem[] = [];
+        catSnap.forEach((d) => {
+          const data = d.data();
+          loaded.push({
+            id_kategori: d.id,
+            nama: data.nama || d.id,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+          });
+        });
+        loaded.sort((a, b) => a.nama.localeCompare(b.nama));
+        setCategories(loaded);
+        setCategoryNames(loaded.map((c) => c.nama));
+      } else {
+        const defaults = DEFAULT_CATEGORIES.map((name) => ({
+          id_kategori: name.toLowerCase(),
+          nama: name,
+        }));
+        setCategories(defaults);
+        setCategoryNames(DEFAULT_CATEGORIES);
+      }
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      setCategoryNames(DEFAULT_CATEGORIES);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  // Reset selected category if deleted
+  useEffect(() => {
+    if (selectedCategory !== "Semua" && !categoryNames.includes(selectedCategory)) {
+      setSelectedCategory("Semua");
+    }
+  }, [categoryNames, selectedCategory]);
+
+  const categoryChips = ["Semua", ...categoryNames];
 
   const visibleHomeReports = reports.filter(
     (r) => r.status_disetujui !== false || r.id_user === currentUser?.id_user,
@@ -312,6 +352,7 @@ export default function App() {
             onReportClick={(report) => setSelectedReport(report)}
             isDark={isDark}
             onToggleTheme={toggleTheme}
+            availableCategories={categoryNames}
           />
           <AnimatePresence>
             {selectedReport && (
@@ -405,6 +446,21 @@ export default function App() {
                 </button>
               )}
 
+              {currentUser?.is_admin && (
+                <button
+                  id="nav-btn-categories"
+                  onClick={() => setCurrentTab("categories")}
+                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+                    currentTab === "categories"
+                      ? "bg-card text-foreground font-semibold shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Tag className="w-3.5 h-3.5" />
+                  <span>Kategori</span>
+                </button>
+              )}
+
               <button
                 id="nav-btn-profile"
                 onClick={() => setCurrentTab("profile")}
@@ -433,7 +489,15 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 pb-28 sm:pb-20">
-        {currentTab === "approval" && currentUser?.is_admin ? (
+        {currentTab === "categories" && currentUser?.is_admin ? (
+          <CategoryManagement
+            currentUser={currentUser}
+            categories={categories}
+            reports={reports}
+            onCategoriesChanged={fetchCategories}
+            onRefreshReports={fetchReports}
+          />
+        ) : currentTab === "approval" && currentUser?.is_admin ? (
           <div className="space-y-4 sm:space-y-5">
             <div className="bg-card border border-border rounded-[var(--radius)] p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
               <div className="space-y-1">
@@ -555,7 +619,7 @@ export default function App() {
                 <span className="text-xs font-medium text-muted-foreground shrink-0 mr-1 hidden sm:inline">
                   Kategori:
                 </span>
-                {CATEGORIES.map((cat) => (
+                {categoryChips.map((cat) => (
                   <button
                     key={cat}
                     id={`category-filter-${cat}`}
@@ -576,6 +640,18 @@ export default function App() {
                     className="min-h-[32px] px-2.5 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 text-destructive hover:bg-destructive/10 border border-destructive/20 transition-colors cursor-pointer whitespace-nowrap"
                   >
                     Reset Filter
+                  </button>
+                )}
+
+                {currentUser?.is_admin && (
+                  <button
+                    id="btn-shortcut-kelola-kategori"
+                    onClick={() => setCurrentTab("categories")}
+                    className="min-h-[32px] px-2.5 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 bg-secondary text-secondary-foreground hover:bg-muted border border-border transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1.5 ml-auto"
+                    title="Kelola Kategori Barang (Khusus Petugas)"
+                  >
+                    <Tag className="w-3.5 h-3.5 text-primary" />
+                    <span>Kelola Kategori</span>
                   </button>
                 )}
               </div>
@@ -685,6 +761,21 @@ export default function App() {
           </button>
         )}
 
+        {currentUser?.is_admin && (
+          <button
+            id="mobile-nav-btn-categories"
+            onClick={() => setCurrentTab("categories")}
+            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
+              currentTab === "categories"
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground"
+            }`}
+          >
+            <Tag className="w-5 h-5 mb-0.5" />
+            <span className="text-[10px]">Kategori</span>
+          </button>
+        )}
+
         <button
           id="mobile-nav-btn-profile"
           onClick={() => setCurrentTab("profile")}
@@ -722,6 +813,7 @@ export default function App() {
             currentUser={currentUser}
             onClose={() => setShowAddModal(false)}
             onSuccess={handleReportCreated}
+            availableCategories={categoryNames}
           />
         )}
       </AnimatePresence>

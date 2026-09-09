@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Report, Category } from '../types';
+import { Report, Category, DEFAULT_CATEGORIES } from '../types';
 import ReportCard from './ReportCard';
 import ThemeToggle from './ThemeToggle';
 import { 
@@ -30,9 +30,8 @@ interface LandingPageProps {
   onReportClick: (report: Report) => void;
   isDark: boolean;
   onToggleTheme: () => void;
+  availableCategories?: string[];
 }
-
-const CATEGORIES: ('Semua' | Category)[] = ['Semua', 'Elektronik', 'Kunci', 'Dompet', 'Hewan', 'Dokumen', 'Lainnya'];
 
 export default function LandingPage({
   reports,
@@ -46,8 +45,10 @@ export default function LandingPage({
   onNavigateToLogin,
   onReportClick,
   isDark,
-  onToggleTheme
+  onToggleTheme,
+  availableCategories,
 }: LandingPageProps) {
+  const categoryChips: string[] = ['Semua', ...(availableCategories && availableCategories.length > 0 ? availableCategories : DEFAULT_CATEGORIES)];
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const totalPost = reports.length;
@@ -271,7 +272,7 @@ export default function LandingPage({
           {/* Category Chips with Horizontal Scroll indicator */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 no-scrollbar scroll-smooth">
             <span className="text-xs font-medium text-muted-foreground shrink-0 mr-1 hidden sm:inline">Kategori:</span>
-            {CATEGORIES.map((cat) => (
+            {categoryChips.map((cat) => (
               <button
                 key={cat}
                 id={`landing-category-filter-${cat}`}

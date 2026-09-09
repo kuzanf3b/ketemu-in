@@ -34,6 +34,18 @@
         "user_whatsapp": { "type": "string", "maxLength": 20 }
       },
       "required": ["id_report", "id_user", "tipe_laporan", "kategori", "judul", "deskripsi", "lokasi", "tgl_kejadian", "status_selesai", "created_at", "user_nama", "user_whatsapp"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Item category for lost and found reports managed by petugas",
+      "type": "object",
+      "properties": {
+        "id_kategori": { "type": "string", "maxLength": 128 },
+        "nama": { "type": "string", "maxLength": 50 },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["id_kategori", "nama"]
     }
   },
   "firestore": {
@@ -44,6 +56,10 @@
     "reports/{reportId}": {
       "schema": "Report",
       "description": "Collection of lost & found reports"
+    },
+    "categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Collection of lost & found categories managed by petugas"
     }
   }
 }

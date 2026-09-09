@@ -27,4 +27,20 @@ export interface Report {
   status_disetujui?: boolean;
 }
 
-export type Category = 'Elektronik' | 'Kunci' | 'Dompet' | 'Hewan' | 'Dokumen' | 'Lainnya';
+export interface CategoryItem {
+  id_kategori: string;
+  nama: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const DEFAULT_CATEGORIES: string[] = [
+  'Elektronik',
+  'Kunci',
+  'Dompet',
+  'Hewan',
+  'Dokumen',
+  'Lainnya',
+];
+
+export type Category = string;
