@@ -29,7 +29,12 @@ export default function ReportDetail({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showApproveConfirm, setShowApproveConfirm] = useState(false);
 
-  const isOwner = currentUser?.id_user === report.id_user;
+  const isOwner = Boolean(
+    currentUser && (
+      currentUser.id_user === report.id_user ||
+      (currentUser.no_whatsapp && report.user_whatsapp && currentUser.no_whatsapp === report.user_whatsapp)
+    )
+  );
   const isAdmin = currentUser?.is_admin === true;
   const isSolved = report.status_selesai;
   const autoDeleteInfo = getAutoDeleteStatus(report);
@@ -229,7 +234,14 @@ export default function ReportDetail({
                 <UserRound className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                 <div>
                   <span className="text-[10px] sm:text-[11px] text-muted-foreground uppercase font-medium block">Pelapor</span>
-                  <span className="font-medium text-foreground text-xs sm:text-sm">{report.user_nama}</span>
+                  <span className="font-medium text-foreground text-xs sm:text-sm flex items-center gap-1.5">
+                    <span>{report.user_nama}</span>
+                    {isOwner && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-primary/15 text-primary border border-primary/20">
+                        Anda
+                      </span>
+                    )}
+                  </span>
                 </div>
               </div>
             </div>
@@ -317,6 +329,17 @@ export default function ReportDetail({
                 <MessageCircle className="w-4 h-4" />
                 Kontak Dinonaktifkan
               </button>
+            ) : isOwner ? (
+              <div
+                id="badge-own-report-contact"
+                className="w-full sm:w-auto min-h-[44px] px-4 py-2.5 bg-secondary text-secondary-foreground font-medium rounded-[var(--radius)] text-xs sm:text-sm flex items-center justify-center gap-2 border border-border shadow-2xs"
+                title="Laporan ini dibuat oleh Anda menggunakan nomor WhatsApp Anda sendiri"
+              >
+                <UserRound className="w-4 h-4 text-primary shrink-0" />
+                <span>
+                  Nomor Anda Sendiri{report.user_whatsapp ? ` (${report.user_whatsapp})` : ''}
+                </span>
+              </div>
             ) : currentUser ? (
               <a
                 id="btn-whatsapp-cta"
