@@ -313,7 +313,7 @@ export default function OfficerHistoryView({
           <p className="text-[10px] text-muted-foreground mt-0.5">Semua data tercatat</p>
         </div>
 
-        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4 shadow-2xs border-l-4 border-l-destructive">
+        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4">
           <div className="flex items-center justify-between text-muted-foreground mb-1">
             <span className="text-[11px] font-medium uppercase tracking-wider text-destructive">
               Arsip Dihapus
@@ -326,25 +326,25 @@ export default function OfficerHistoryView({
           <p className="text-[10px] text-muted-foreground mt-0.5">Khusus dilihat petugas</p>
         </div>
 
-        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4 shadow-2xs border-l-4 border-l-success">
+        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4">
           <div className="flex items-center justify-between text-muted-foreground mb-1">
             <span className="text-[11px] font-medium uppercase tracking-wider text-success">
               Selesai / Tuntas
             </span>
             <CheckCircle2 className="w-4 h-4 text-success" />
           </div>
-          <div className="text-xl sm:text-2xl font-serif font-bold text-foreground mt-1">
+          <div className="text-xl sm:text-2xl font-serif font-bold text-success mt-1">
             {totalResolved}
           </div>
           <p className="text-[10px] text-muted-foreground mt-0.5">Barang berhasil kembali</p>
         </div>
 
-        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4 shadow-2xs border-l-4 border-l-warning">
+        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4">
           <div className="flex items-center justify-between text-muted-foreground mb-1">
             <span className="text-[11px] font-medium uppercase tracking-wider text-warning">Ditolak</span>
             <AlertTriangle className="w-4 h-4 text-warning" />
           </div>
-          <div className="text-xl sm:text-2xl font-serif font-bold text-foreground mt-1">
+          <div className="text-xl sm:text-2xl font-serif font-bold text-warning mt-1">
             {totalRejected}
           </div>
           <p className="text-[10px] text-muted-foreground mt-0.5">Tidak disetujui petugas</p>
