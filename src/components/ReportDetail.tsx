@@ -163,7 +163,7 @@ export default function ReportDetail({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-foreground/50 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-foreground/45 backdrop-blur-xs overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -327,7 +327,7 @@ export default function ReportDetail({
                 id="btn-approve-report"
                 onClick={handleApproveClick}
                 disabled={loading}
-                className="flex-1 sm:flex-initial min-h-[42px] px-3.5 sm:px-4 py-2 text-xs font-medium text-white bg-[var(--chart-1)] hover:opacity-90 rounded-[var(--radius)] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="flex-1 sm:flex-initial min-h-[42px] px-3.5 sm:px-4 py-2 text-xs font-medium text-success-foreground bg-success hover:opacity-90 rounded-[var(--radius)] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Setujui</span>
@@ -386,7 +386,7 @@ export default function ReportDetail({
                 href={getWhatsAppLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-[var(--chart-1)] text-white hover:opacity-90 font-medium rounded-[var(--radius)] text-xs sm:text-sm shadow-xs transition-opacity flex items-center justify-center gap-2"
+                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-success text-success-foreground hover:opacity-90 font-medium rounded-[var(--radius)] text-xs sm:text-sm shadow-xs transition-opacity flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-4 h-4" />
                 Hubungi via WhatsApp
@@ -398,7 +398,7 @@ export default function ReportDetail({
                   onClose();
                   alert('Silakan masuk atau daftar akun terlebih dahulu untuk menghubungi pelapor.');
                 }}
-                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-primary text-primary-foreground hover:opacity-90 font-medium rounded-[var(--radius)] text-xs sm:text-sm transition-opacity flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 bg-primary text-primary-foreground hover:opacity-90 font-medium rounded-[var(--radius)] text-xs sm:text-sm transition-opacity flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <MessageCircle className="w-4 h-4" />
                 Masuk untuk Hubungi

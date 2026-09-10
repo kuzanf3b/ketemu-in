@@ -163,7 +163,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess, availableC
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-foreground/50 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-foreground/45 backdrop-blur-xs overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -217,7 +217,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess, availableC
                 onClick={() => setTipeLaporan('DITEMUKAN')}
                 className={`min-h-[40px] py-2 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${
                   tipeLaporan === 'DITEMUKAN'
-                    ? 'bg-primary text-primary-foreground shadow-xs'
+                    ? 'bg-[var(--chart-2)] text-[var(--primary-foreground)] shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >

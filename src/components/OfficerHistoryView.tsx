@@ -326,12 +326,12 @@ export default function OfficerHistoryView({
           <p className="text-[10px] text-muted-foreground mt-0.5">Khusus dilihat petugas</p>
         </div>
 
-        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4 shadow-2xs border-l-4 border-l-[var(--chart-1)]">
+        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4 shadow-2xs border-l-4 border-l-success">
           <div className="flex items-center justify-between text-muted-foreground mb-1">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--chart-1)]">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-success">
               Selesai / Tuntas
             </span>
-            <CheckCircle2 className="w-4 h-4 text-[var(--chart-1)]" />
+            <CheckCircle2 className="w-4 h-4 text-success" />
           </div>
           <div className="text-xl sm:text-2xl font-serif font-bold text-foreground mt-1">
             {totalResolved}
@@ -339,10 +339,10 @@ export default function OfficerHistoryView({
           <p className="text-[10px] text-muted-foreground mt-0.5">Barang berhasil kembali</p>
         </div>
 
-        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4 shadow-2xs">
+        <div className="bg-card border border-border rounded-[var(--radius)] p-3.5 sm:p-4 shadow-2xs border-l-4 border-l-warning">
           <div className="flex items-center justify-between text-muted-foreground mb-1">
-            <span className="text-[11px] font-medium uppercase tracking-wider">Ditolak</span>
-            <AlertTriangle className="w-4 h-4 text-orange-500" />
+            <span className="text-[11px] font-medium uppercase tracking-wider text-warning">Ditolak</span>
+            <AlertTriangle className="w-4 h-4 text-warning" />
           </div>
           <div className="text-xl sm:text-2xl font-serif font-bold text-foreground mt-1">
             {totalRejected}
@@ -374,7 +374,7 @@ export default function OfficerHistoryView({
             onClick={() => setCurrentTab('archived')}
             className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
               currentTab === 'archived'
-                ? 'bg-destructive text-white font-semibold shadow-xs'
+                ? 'bg-destructive text-destructive-foreground font-semibold shadow-xs'
                 : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
             }`}
           >
@@ -388,7 +388,7 @@ export default function OfficerHistoryView({
             onClick={() => setCurrentTab('resolved')}
             className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
               currentTab === 'resolved'
-                ? 'bg-[var(--chart-1)] text-white font-semibold shadow-xs'
+                ? 'bg-success text-success-foreground font-semibold shadow-xs'
                 : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
             }`}
           >
@@ -402,7 +402,7 @@ export default function OfficerHistoryView({
             onClick={() => setCurrentTab('rejected')}
             className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
               currentTab === 'rejected'
-                ? 'bg-orange-600 text-white font-semibold shadow-xs'
+                ? 'bg-warning text-warning-foreground font-semibold shadow-xs'
                 : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
             }`}
           >
@@ -587,10 +587,10 @@ export default function OfficerHistoryView({
                       {/* Tipe Laporan */}
                       <td className="py-3.5 px-3">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                             item.tipe_laporan === 'HILANG'
-                              ? 'bg-destructive/15 text-destructive border border-destructive/30'
-                              : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'
+                              ? 'bg-[var(--chart-1)] text-white'
+                              : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
                           }`}
                         >
                           {item.tipe_laporan}
@@ -611,7 +611,7 @@ export default function OfficerHistoryView({
                       <td className="py-3.5 px-3">
                         {isArchived ? (
                           <div className="space-y-1">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-destructive/15 text-destructive border border-destructive/30">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-destructive/15 text-destructive border border-destructive/30">
                               <Archive className="w-3 h-3 shrink-0" />
                               <span>Diarsipkan (Dihapus)</span>
                             </span>
@@ -621,7 +621,7 @@ export default function OfficerHistoryView({
                           </div>
                         ) : isSolved ? (
                           <div className="space-y-1">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-[var(--chart-1)]/15 text-[var(--chart-1)] border border-[var(--chart-1)]/30">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-success-background text-success border border-success">
                               <CheckCircle2 className="w-3 h-3 shrink-0" />
                               <span>Selesai / Kembali</span>
                             </span>
@@ -632,7 +632,7 @@ export default function OfficerHistoryView({
                             )}
                           </div>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-secondary text-secondary-foreground border border-border">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-secondary text-secondary-foreground border border-border">
                             <Clock className="w-3 h-3 shrink-0 text-primary" />
                             <span>Sedang Tayang</span>
                           </span>
@@ -712,8 +712,8 @@ export default function OfficerHistoryView({
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
                             item.tipe_laporan === 'HILANG'
-                              ? 'bg-destructive/15 text-destructive border border-destructive/30'
-                              : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'
+                              ? 'bg-[var(--chart-1)] text-white'
+                              : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
                           }`}
                         >
                           {item.tipe_laporan}
@@ -739,7 +739,7 @@ export default function OfficerHistoryView({
                           Diarsipkan: {item.deleted_by_name || 'Warga'}
                         </span>
                       ) : isSolved ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[var(--chart-1)]">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-success">
                           <CheckCircle2 className="w-3 h-3" />
                           Selesai / Kembali
                         </span>
@@ -776,7 +776,7 @@ export default function OfficerHistoryView({
         {selectedItem && (
           <div
             id="modal-history-detail"
-            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-background/80 backdrop-blur-xs overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-foreground/45 backdrop-blur-xs overflow-y-auto"
             onClick={() => setSelectedItem(null)}
           >
             <motion.div
@@ -792,10 +792,10 @@ export default function OfficerHistoryView({
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                         selectedItem.data.tipe_laporan === 'HILANG'
-                          ? 'bg-destructive/15 text-destructive border border-destructive/30'
-                          : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'
+                          ? 'bg-[var(--chart-1)] text-white'
+                          : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
                       }`}
                     >
                       {selectedItem.data.tipe_laporan}
@@ -804,12 +804,12 @@ export default function OfficerHistoryView({
                       {selectedItem.data.kategori}
                     </span>
                     {selectedItem.type === 'archived' ? (
-                      <span className="bg-destructive/15 text-destructive text-[10px] px-2 py-0.5 rounded font-bold border border-destructive/30 flex items-center gap-1">
+                      <span className="bg-destructive/15 text-destructive text-[10px] px-2 py-0.5 rounded-full font-bold border border-destructive/30 flex items-center gap-1">
                         <Archive className="w-3 h-3" />
                         ARSIP DIHAPUS
                       </span>
                     ) : selectedItem.data.status_selesai ? (
-                      <span className="bg-[var(--chart-1)]/15 text-[var(--chart-1)] text-[10px] px-2 py-0.5 rounded font-bold border border-[var(--chart-1)]/30 flex items-center gap-1">
+                      <span className="bg-success-background text-success text-[10px] px-2 py-0.5 rounded-full font-bold border border-success flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3" />
                         SELESAI
                       </span>

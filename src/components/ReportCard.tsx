@@ -63,7 +63,7 @@ export default function ReportCard({ report, onClick }: ReportCardProps) {
 
         {report.status_disetujui === false && (
           <div className="absolute top-2.5 right-2.5 z-10">
-            <span className="px-2 py-0.5 rounded-full bg-[var(--chart-1)] text-white text-xs font-semibold flex items-center gap-1 shadow-xs">
+            <span className="px-2.5 py-0.5 rounded-full bg-warning text-warning-foreground text-xs font-semibold flex items-center gap-1 shadow-xs">
               <Clock className="w-3 h-3" />
               Menunggu Persetujuan
             </span>
@@ -71,13 +71,13 @@ export default function ReportCard({ report, onClick }: ReportCardProps) {
         )}
 
         {isSolved && (
-          <div className="absolute inset-0 bg-background/70 backdrop-blur-xs flex flex-col items-center justify-center p-3 text-center gap-1.5">
-            <div className="bg-[var(--chart-5)] text-foreground border border-border px-3 py-1.5 rounded-full flex items-center gap-1.5 font-semibold text-xs shadow-xs">
+          <div className="absolute inset-0 bg-background/75 backdrop-blur-xs flex flex-col items-center justify-center p-3 text-center gap-1.5">
+            <div className="bg-success text-success-foreground border border-success px-3 py-1.5 rounded-full flex items-center gap-1.5 font-semibold text-xs shadow-xs">
               <CheckCircle2 className="w-3.5 h-3.5" />
               SELESAI / KETEMU
             </div>
             <div className="bg-background/90 text-foreground border border-border px-2.5 py-0.5 rounded-full flex items-center gap-1 text-[10px] font-medium shadow-xs">
-              <Hourglass className="w-3 h-3 text-[var(--chart-1)]" />
+              <Hourglass className="w-3 h-3 text-warning" />
               <span>{autoDeleteInfo.formattedCountdown}</span>
             </div>
           </div>

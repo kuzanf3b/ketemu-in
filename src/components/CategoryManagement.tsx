@@ -342,15 +342,15 @@ export default function CategoryManagement({
 
       {/* Alert Notices */}
       {errorMsg && (
-        <div className="p-3.5 rounded-[var(--radius)] bg-destructive/10 border border-destructive/30 text-destructive text-xs flex items-center justify-between gap-2">
+        <div className="p-3.5 rounded-[var(--radius)] bg-error-background border border-error text-foreground text-xs flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <AlertTriangle className="w-4 h-4 shrink-0 text-error" />
             <span>{errorMsg}</span>
           </div>
           <button
             type="button"
             onClick={() => setErrorMsg('')}
-            className="text-destructive/80 hover:text-destructive cursor-pointer p-1"
+            className="text-muted-foreground hover:text-foreground cursor-pointer p-1"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -358,9 +358,9 @@ export default function CategoryManagement({
       )}
 
       {successMsg && (
-        <div className="p-3.5 rounded-[var(--radius)] bg-primary/10 border border-primary/30 text-foreground text-xs flex items-center justify-between gap-2">
+        <div className="p-3.5 rounded-[var(--radius)] bg-success-background border border-success text-foreground text-xs flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-primary" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-success" />
             <span className="font-medium">{successMsg}</span>
           </div>
           <button
@@ -590,10 +590,10 @@ export default function CategoryManagement({
 
       {/* Modal Konfirmasi Hapus Kategori */}
       {deletingCategory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/45 backdrop-blur-xs">
           <div className="relative bg-card text-card-foreground w-full max-w-md rounded-[var(--radius)] p-5 sm:p-6 border border-border shadow-xl space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-full bg-destructive/15 border border-destructive/20 text-destructive flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-9 h-9 rounded-full bg-error-background border border-error text-error flex items-center justify-center shrink-0 mt-0.5">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div className="space-y-1">
@@ -608,9 +608,9 @@ export default function CategoryManagement({
 
             {/* Reassign warning if reports exist */}
             {(reportCountByCategory[deletingCategory.nama] || 0) > 0 ? (
-              <div className="p-3 bg-warning-background border border-warning/30 rounded-[var(--radius)] space-y-2">
+              <div className="p-3 bg-warning-background border border-warning rounded-[var(--radius)] space-y-2">
                 <div className="flex items-center gap-1.5 text-warning font-semibold text-xs">
-                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-warning" />
                   <span>
                     Ada {reportCountByCategory[deletingCategory.nama]} laporan menggunakan kategori ini
                   </span>
