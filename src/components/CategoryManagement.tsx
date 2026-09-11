@@ -257,43 +257,6 @@ export default function CategoryManagement({
     }
   };
 
-  // Seed / Reset Default Categories
-  const handleSeedDefaults = async () => {
-    clearAlerts();
-    setIsSeeding(true);
-
-    try {
-      const batch = writeBatch(db);
-      const existingNames = new Set(categories.map((c) => c.nama.toLowerCase()));
-
-      let addedCount = 0;
-      for (const defaultName of DEFAULT_CATEGORIES) {
-        if (!existingNames.has(defaultName.toLowerCase())) {
-          const newDocRef = doc(collection(db, 'categories'));
-          batch.set(newDocRef, {
-            id_kategori: newDocRef.id,
-            nama: defaultName,
-            created_at: new Date().toISOString(),
-          });
-          addedCount++;
-        }
-      }
-
-      if (addedCount > 0) {
-        await batch.commit();
-        setSuccessMsg(`Berhasil menambahkan ${addedCount} kategori standar.`);
-        onCategoriesChanged();
-      } else {
-        setSuccessMsg('Semua kategori standar sudah tersedia.');
-      }
-    } catch (err) {
-      handleFirestoreError(err, OperationType.WRITE, 'categories');
-      setErrorMsg('Gagal memuat kategori standar.');
-    } finally {
-      setIsSeeding(false);
-    }
-  };
-
   if (!currentUser.is_admin) {
     return (
       <div className="bg-card rounded-[var(--radius)] p-8 text-center border border-border max-w-md mx-auto my-8">
@@ -326,17 +289,6 @@ export default function CategoryManagement({
             <Tag className="w-3.5 h-3.5 text-primary" />
             <span>{categories.length} Kategori Aktif</span>
           </div>
-          <button
-            id="btn-seed-default-categories"
-            type="button"
-            onClick={handleSeedDefaults}
-            disabled={isSeeding}
-            className="min-h-[34px] px-3 py-1.5 rounded-[var(--radius)] bg-background hover:bg-muted text-foreground border border-border text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs disabled:opacity-50"
-            title="Muat atau lengkapi dengan 6 kategori standar bawaan"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-muted-foreground ${isSeeding ? 'animate-spin' : ''}`} />
-            <span>Kategori Standar</span>
-          </button>
         </div>
       </div>
 
@@ -461,14 +413,6 @@ export default function CategoryManagement({
             ) : (
               <div className="space-y-3">
                 <p>Belum ada kategori yang terdaftar.</p>
-                <button
-                  type="button"
-                  onClick={handleSeedDefaults}
-                  className="px-4 py-2 text-xs font-semibold rounded-[var(--radius)] bg-primary text-primary-foreground hover:opacity-90 transition-opacity cursor-pointer inline-flex items-center gap-1.5"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  Muat 6 Kategori Standar
-                </button>
               </div>
             )}
           </div>
