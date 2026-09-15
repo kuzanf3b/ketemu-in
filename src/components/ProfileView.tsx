@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Report, User } from '../types';
-import { Phone, CheckCircle2, LogOut, Trash2, Calendar, MapPin, Tag, Hourglass } from 'lucide-react';
+import { Phone, CheckCircle2, LogOut, Trash2, Calendar, MapPin, Tag, Hourglass, ShieldAlert } from 'lucide-react';
 import { motion } from 'motion/react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { getAutoDeleteStatus } from '../lib/cleanupUtils';
 import { archiveAndDeleteReport } from '../lib/reportArchive';
+import { deleteUserAndArchiveReports } from '../lib/userManagement';
 import ConfirmModal from './ConfirmModal';
 
 interface ProfileViewProps {
@@ -15,6 +16,7 @@ interface ProfileViewProps {
   onReportClick: (report: Report) => void;
   onResolve: (id: string, selesaiAt?: string) => void;
   onDelete: (id: string) => void;
+  onUserDeleted?: () => void;
 }
 
 export default function ProfileView({
@@ -24,9 +26,12 @@ export default function ProfileView({
   onReportClick,
   onResolve,
   onDelete,
+  onUserDeleted,
 }: ProfileViewProps) {
   const [pendingResolveReport, setPendingResolveReport] = useState<Report | null>(null);
   const [pendingDeleteReport, setPendingDeleteReport] = useState<Report | null>(null);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const userReports = reports.filter((r) => r.id_user === currentUser.id_user);
 
@@ -95,6 +100,43 @@ export default function ProfileView({
         if (parsed?.error) msg = parsed.error;
       } catch { }
       alert(msg);
+    }
+  };
+
+  const executeDeleteAccount = async () => {
+    setShowDeleteAccountModal(false);
+    setIsDeletingAccount(true);
+
+    try {
+      const result = await deleteUserAndArchiveReports(currentUser, {
+        uid: currentUser.id_user,
+        name: currentUser.nama_lengkap || 'Warga',
+        role: currentUser.is_admin ? 'petugas' : 'warga',
+      });
+
+      alert(
+        `Akun Anda berhasil dihapus.${
+          result.archivedReportsCount > 0
+            ? ` ${result.archivedReportsCount} laporan Anda telah disimpan ke Arsip Petugas demi keamanan informasi warga.`
+            : ''
+        }`
+      );
+
+      if (onUserDeleted) {
+        onUserDeleted();
+      } else {
+        onLogout();
+      }
+    } catch (err: any) {
+      console.error('Failed to delete account:', err);
+      let msg = err.message || 'Gagal menghapus akun.';
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed?.error) msg = parsed.error;
+      } catch {}
+      alert(msg);
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -267,6 +309,30 @@ export default function ProfileView({
         )}
       </div>
 
+      {/* Danger Zone: Account Management */}
+      <div className="pt-4 border-t border-border">
+        <div className="bg-card rounded-[var(--radius)] p-4 sm:p-5 border border-destructive/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <h4 className="text-xs sm:text-sm font-semibold text-destructive flex items-center gap-1.5">
+              <ShieldAlert className="w-4 h-4" />
+              Zona Berbahaya: Hapus Akun Saya
+            </h4>
+            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 max-w-xl leading-relaxed">
+              Menghapus akun Anda dari RW 04. Seluruh laporan aktif Anda akan otomatis dialihkan ke Arsip Petugas demi rekam jejak barang warga (Opsi C).
+            </p>
+          </div>
+          <button
+            type="button"
+            id="btn-delete-own-account"
+            onClick={() => setShowDeleteAccountModal(true)}
+            className="min-h-[36px] px-3.5 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/10 border border-destructive/40 rounded-[var(--radius)] transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Hapus Akun</span>
+          </button>
+        </div>
+      </div>
+
       {/* Confirm Modals */}
       <ConfirmModal
         isOpen={pendingResolveReport !== null}
@@ -286,6 +352,21 @@ export default function ProfileView({
         cancelText="Batal"
         onConfirm={executeDelete}
         onCancel={() => setPendingDeleteReport(null)}
+        isDanger
+      />
+
+      <ConfirmModal
+        isOpen={showDeleteAccountModal}
+        title="Konfirmasi Hapus Akun"
+        message={`Apakah Anda yakin ingin menghapus akun Anda? ${
+          userReports.length > 0
+            ? `\n\n📌 OPSI C DIJALANKAN: ${userReports.length} laporan milik Anda akan otomatis dipindahkan ke Arsip Petugas agar feed warga tetap bersih namun riwayat barang tetap tercatat.`
+            : ''
+        }`}
+        confirmText={isDeletingAccount ? 'Menghapus...' : 'Hapus Akun Saya'}
+        cancelText="Batal"
+        onConfirm={executeDeleteAccount}
+        onCancel={() => setShowDeleteAccountModal(false)}
         isDanger
       />
     </div>

@@ -116,7 +116,7 @@ service cloud.firestore {
           (incoming().is_admin == existing().is_admin))) ||
         isAdmin()
       );
-      allow delete: if isAdmin();
+      allow delete: if isSignedIn() && (request.auth.uid == userId || isAdmin());
     }
 
     // Match reports

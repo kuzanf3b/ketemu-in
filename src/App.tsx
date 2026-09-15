@@ -7,6 +7,7 @@ import ReportForm from "./components/ReportForm";
 import ProfileView from "./components/ProfileView";
 import CategoryManagement from "./components/CategoryManagement";
 import OfficerHistoryView from "./components/OfficerHistoryView";
+import UserManagement from "./components/UserManagement";
 import LandingPage from "./components/LandingPage";
 import ThemeToggle from "./components/ThemeToggle";
 import {
@@ -15,6 +16,7 @@ import {
   SlidersHorizontal,
   Compass,
   UserRound,
+  Users,
   CheckCircle2,
   ArrowLeft,
   X,
@@ -64,7 +66,7 @@ export default function App() {
   const [viewState, setViewState] = useState<"landing" | "login">("landing");
 
   const [currentTab, setCurrentTab] = useState<
-    "home" | "profile" | "approval" | "categories" | "history"
+    "home" | "profile" | "approval" | "categories" | "history" | "users"
   >("home");
   const [reports, setReports] = useState<Report[]>([]);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
@@ -475,6 +477,20 @@ export default function App() {
                 </button>
               )}
 
+              {currentUser?.is_admin && (
+                <button
+                  id="nav-btn-users"
+                  onClick={() => setCurrentTab("users")}
+                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "users"
+                      ? "bg-card text-foreground font-semibold shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                    }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Warga</span>
+                </button>
+              )}
+
               <button
                 id="nav-btn-profile"
                 onClick={() => setCurrentTab("profile")}
@@ -507,6 +523,12 @@ export default function App() {
             currentUser={currentUser}
             activeReports={reports}
             onRefreshActiveReports={fetchReports}
+          />
+        ) : currentTab === "users" && currentUser?.is_admin ? (
+          <UserManagement
+            currentUser={currentUser}
+            reports={reports}
+            onRefreshReports={fetchReports}
           />
         ) : currentTab === "categories" && currentUser?.is_admin ? (
           <CategoryManagement
@@ -725,6 +747,7 @@ export default function App() {
             onReportClick={setSelectedReport}
             onResolve={handleReportResolved}
             onDelete={handleReportDeleted}
+            onUserDeleted={handleLogout}
           />
         )}
       </main>
@@ -742,11 +765,11 @@ export default function App() {
       )}
 
       {/* Mobile Bottom Navigation Bar (< 640px viewport) */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border px-3 py-2 flex justify-around items-center">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border px-2 py-2 flex justify-around items-center">
         <button
           id="mobile-nav-btn-home"
           onClick={() => setCurrentTab("home")}
-          className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "home"
+          className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "home"
               ? "text-foreground font-semibold"
               : "text-muted-foreground"
             }`}
@@ -759,7 +782,7 @@ export default function App() {
           <button
             id="mobile-nav-btn-approval"
             onClick={() => setCurrentTab("approval")}
-            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer relative ${currentTab === "approval"
+            className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer relative ${currentTab === "approval"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
               }`}
@@ -780,7 +803,7 @@ export default function App() {
           <button
             id="mobile-nav-btn-categories"
             onClick={() => setCurrentTab("categories")}
-            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "categories"
+            className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "categories"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
               }`}
@@ -794,7 +817,7 @@ export default function App() {
           <button
             id="mobile-nav-btn-history"
             onClick={() => setCurrentTab("history")}
-            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "history"
+            className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "history"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
               }`}
@@ -804,10 +827,24 @@ export default function App() {
           </button>
         )}
 
+        {currentUser?.is_admin && (
+          <button
+            id="mobile-nav-btn-users"
+            onClick={() => setCurrentTab("users")}
+            className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "users"
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground"
+              }`}
+          >
+            <Users className="w-5 h-5 mb-0.5" />
+            <span className="text-[10px]">Warga</span>
+          </button>
+        )}
+
         <button
           id="mobile-nav-btn-profile"
           onClick={() => setCurrentTab("profile")}
-          className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "profile"
+          className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "profile"
               ? "text-foreground font-semibold"
               : "text-muted-foreground"
             }`}

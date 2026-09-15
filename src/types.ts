@@ -2,6 +2,7 @@ export interface User {
   id_user: string;
   nama_lengkap: string;
   no_whatsapp: string;
+  rt_rw?: string;
   created_at: string;
   is_admin?: boolean;
 }
