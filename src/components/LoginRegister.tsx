@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../types';
-import { Eye, EyeOff, KeyRound, Phone, UserRound, ArrowRight, AlertCircle, AlertTriangle } from 'lucide-react';
+import { Eye, EyeOff, KeyRound, Phone, UserRound, ArrowRight, AlertCircle, AlertTriangle, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -14,6 +14,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [namaLengkap, setNamaLengkap] = useState('');
   const [noWhatsapp, setNoWhatsapp] = useState('');
+  const [rtRw, setRtRw] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -92,6 +93,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           id_user: userData.id_user,
           nama_lengkap: userData.nama_lengkap,
           no_whatsapp: userData.no_whatsapp,
+          rt_rw: userData.rt_rw || 'RT 00 / RW 04',
           created_at: userData.created_at,
           is_admin: userData.is_admin || false
         });
@@ -115,6 +117,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
           id_user: uid,
           nama_lengkap: namaLengkap.trim(),
           no_whatsapp: cleanedPhone,
+          rt_rw: rtRw.trim() || 'RT 00 / RW 04',
           created_at: new Date().toISOString(),
           is_admin: isPetugas
         };
@@ -214,6 +217,27 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                   onChange={(e) => setNamaLengkap(e.target.value)}
                   className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
                   required={!isLogin}
+                />
+              </div>
+            </div>
+          )}
+
+          {!isLogin && (
+            <div className="space-y-1.5">
+              <label htmlFor="register-rtrw" className="text-sm font-medium text-foreground block">
+                Domisili RT / RW
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground pointer-events-none">
+                  <MapPin className="w-4 h-4" />
+                </span>
+                <input
+                  id="register-rtrw"
+                  type="text"
+                  placeholder="Contoh: RT 03 / RW 04"
+                  value={rtRw}
+                  onChange={(e) => setRtRw(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
                 />
               </div>
             </div>

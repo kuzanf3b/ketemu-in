@@ -31,11 +31,11 @@ service cloud.firestore {
 
     // 1. User Entity Validation
     function isValidUser(data) {
-      return data.keys().hasAll(['nama_lengkap', 'no_whatsapp', 'rt_rw'])
+      return data.keys().hasAll(['nama_lengkap', 'no_whatsapp'])
           && data.keys().size() <= 10
           && data.nama_lengkap is string && data.nama_lengkap.size() >= 1 && data.nama_lengkap.size() <= 100
           && data.no_whatsapp is string && data.no_whatsapp.size() >= 8 && data.no_whatsapp.size() <= 20
-          && data.rt_rw is string && data.rt_rw.size() >= 1 && data.rt_rw.size() <= 30
+          && (!('rt_rw' in data) || (data.rt_rw is string && data.rt_rw.size() <= 30))
           && (!('id_user' in data) || (data.id_user is string && data.id_user.size() <= 128))
           && (!('email' in data) || (data.email is string && data.email.size() <= 120))
           && (!('foto_profil' in data) || data.foto_profil is string)

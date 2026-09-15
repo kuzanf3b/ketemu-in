@@ -177,9 +177,17 @@ export default function ProfileView({
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-muted-foreground text-xs mt-1">
-              <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-              <span>+{currentUser.no_whatsapp}</span>
+            <div className="flex items-center gap-3 text-muted-foreground text-xs mt-1">
+              <div className="flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <span>+{currentUser.no_whatsapp}</span>
+              </div>
+              {currentUser.rt_rw && (
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <span>•</span>
+                  <span>{currentUser.rt_rw}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
