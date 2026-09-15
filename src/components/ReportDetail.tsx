@@ -66,7 +66,7 @@ export default function ReportDetail({
       try {
         const parsed = JSON.parse(err.message);
         if (parsed?.error) msg = parsed.error;
-      } catch {}
+      } catch { }
       alert(msg);
     } finally {
       setLoading(false);
@@ -84,10 +84,10 @@ export default function ReportDetail({
     try {
       const isOfficer = currentUser?.is_admin === true;
       const isRejection = isOfficer && report.status_disetujui === false;
-      
-      const reason = isRejection 
+
+      const reason = isRejection
         ? 'Laporan ditolak / tidak disetujui oleh Petugas RW'
-        : isOfficer 
+        : isOfficer
           ? 'Dihapus secara manual oleh Petugas RW'
           : 'Dihapus secara manual oleh Pemilik Laporan (Warga)';
 
@@ -104,7 +104,7 @@ export default function ReportDetail({
       try {
         const parsed = JSON.parse(err.message);
         if (parsed?.error) msg = parsed.error;
-      } catch {}
+      } catch { }
       alert(msg);
     } finally {
       setLoading(false);
@@ -136,7 +136,7 @@ export default function ReportDetail({
       try {
         const parsed = JSON.parse(err.message);
         if (parsed?.error) msg = parsed.error;
-      } catch {}
+      } catch { }
       alert(msg);
     } finally {
       setLoading(false);
@@ -202,9 +202,8 @@ export default function ReportDetail({
         <button
           onClick={onClose}
           aria-label="Tutup detail laporan"
-          className={`absolute z-20 p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-full sm:rounded-[var(--radius)] bg-background/85 hover:bg-muted text-foreground border border-border transition-colors cursor-pointer shadow-xs ${
-            report.status_disetujui === false ? 'top-2 right-2.5 sm:top-2.5 sm:right-3' : 'top-3 right-3'
-          }`}
+          className={`absolute z-20 p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-full sm:rounded-[var(--radius)] bg-background/85 hover:bg-muted text-foreground border border-border transition-colors cursor-pointer shadow-xs ${report.status_disetujui === false ? 'top-2 right-2.5 sm:top-2.5 sm:right-3' : 'top-3 right-3'
+            }`}
         >
           <X className="w-4 h-4" />
         </button>
@@ -222,11 +221,10 @@ export default function ReportDetail({
               <div className="space-y-1.5 w-full">
                 <div className="flex flex-wrap gap-1.5">
                   <span
-                    className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                      report.tipe_laporan === 'HILANG'
-                        ? 'bg-[var(--chart-1)] text-white'
-                        : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
-                    }`}
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${report.tipe_laporan === 'HILANG'
+                      ? 'bg-[var(--chart-1)] text-white'
+                      : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
+                      }`}
                   >
                     {report.tipe_laporan}
                   </span>

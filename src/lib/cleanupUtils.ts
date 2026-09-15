@@ -1,6 +1,6 @@
-import { Report } from '../types';
-import { auth } from './firebase';
-import { archiveAndDeleteReport } from './reportArchive';
+import { Report } from "../types";
+import { auth } from "./firebase";
+import { archiveAndDeleteReport } from "./reportArchive";
 
 export const AUTO_DELETE_HOURS = 24;
 export const AUTO_DELETE_MS = AUTO_DELETE_HOURS * 60 * 60 * 1000;
@@ -26,7 +26,7 @@ export function getAutoDeleteStatus(report: Report): AutoDeleteStatus {
       remainingMs: 0,
       remainingHours: 0,
       remainingMinutes: 0,
-      formattedCountdown: ''
+      formattedCountdown: "",
     };
   }
 
@@ -42,15 +42,15 @@ export function getAutoDeleteStatus(report: Report): AutoDeleteStatus {
   const remainingHours = Math.floor(totalMinutes / 60);
   const remainingMinutes = totalMinutes % 60;
 
-  let formattedCountdown = '';
+  let formattedCountdown = "";
   if (isExpired) {
-    formattedCountdown = 'Kedaluwarsa (proses hapus)';
+    formattedCountdown = "Kedaluwarsa (proses hapus)";
   } else if (remainingHours > 0) {
     formattedCountdown = `Dihapus dlm ${remainingHours} jam ${remainingMinutes} mnt`;
   } else if (remainingMinutes > 0) {
     formattedCountdown = `Dihapus dlm ${remainingMinutes} menit`;
   } else {
-    formattedCountdown = 'Dihapus dlm < 1 menit';
+    formattedCountdown = "Dihapus dlm < 1 menit";
   }
 
   return {
@@ -59,7 +59,7 @@ export function getAutoDeleteStatus(report: Report): AutoDeleteStatus {
     remainingMs,
     remainingHours,
     remainingMinutes,
-    formattedCountdown
+    formattedCountdown,
   };
 }
 
@@ -68,13 +68,15 @@ export function getAutoDeleteStatus(report: Report): AutoDeleteStatus {
  * for more than 24 hours, and asynchronously deletes them from Firestore.
  * Returns the IDs of the deleted reports. Only executes if a user is authenticated.
  */
-export async function purgeExpiredResolvedReports(reports: Report[]): Promise<string[]> {
+export async function purgeExpiredResolvedReports(
+  reports: Report[],
+): Promise<string[]> {
   // Only authenticated sessions can perform delete operations
   if (!auth.currentUser) {
     return [];
   }
 
-  const expiredReports = reports.filter(r => {
+  const expiredReports = reports.filter((r) => {
     if (!r.status_selesai) return false;
     const status = getAutoDeleteStatus(r);
     return status.isExpired;
@@ -90,9 +92,11 @@ export async function purgeExpiredResolvedReports(reports: Report[]): Promise<st
     try {
       await archiveAndDeleteReport(report, {
         deletedByUid: auth.currentUser.uid,
-        deletedByName: auth.currentUser.displayName || 'Sistem Pembersihan Otomatis',
-        deletedByRole: 'sistem',
-        deleteReason: 'Otomatis diarsipkan & dihapus dari feed setelah 24 jam status selesai'
+        deletedByName:
+          auth.currentUser.displayName || "Sistem Pembersihan Otomatis",
+        deletedByRole: "sistem",
+        deleteReason:
+          "Otomatis diarsipkan & dihapus dari feed setelah 24 jam status selesai",
       });
       deletedIds.push(report.id_report);
     } catch (err) {

@@ -20,7 +20,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess, availableC
   const [kategori, setKategori] = useState<string>(() => categoryList[0] || 'Elektronik');
   const [lokasi, setLokasi] = useState('');
   const [tglKejadian, setTglKejadian] = useState(() => new Date().toISOString().split('T')[0]);
-  
+
   // Image handling
   const [fotoUrl, setFotoUrl] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -203,11 +203,10 @@ export default function ReportForm({ currentUser, onClose, onSuccess, availableC
                 type="button"
                 id="btn-toggle-hilang"
                 onClick={() => setTipeLaporan('HILANG')}
-                className={`min-h-[40px] py-2 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${
-                  tipeLaporan === 'HILANG'
+                className={`min-h-[40px] py-2 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${tipeLaporan === 'HILANG'
                     ? 'bg-[var(--chart-1)] text-white shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
-                }`}
+                  }`}
               >
                 HILANG / KEHILANGAN
               </button>
@@ -215,11 +214,10 @@ export default function ReportForm({ currentUser, onClose, onSuccess, availableC
                 type="button"
                 id="btn-toggle-ditemukan"
                 onClick={() => setTipeLaporan('DITEMUKAN')}
-                className={`min-h-[40px] py-2 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${
-                  tipeLaporan === 'DITEMUKAN'
+                className={`min-h-[40px] py-2 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer ${tipeLaporan === 'DITEMUKAN'
                     ? 'bg-[var(--chart-2)] text-[var(--primary-foreground)] shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
-                }`}
+                  }`}
               >
                 DITEMUKAN / TEMUAN
               </button>
@@ -231,7 +229,7 @@ export default function ReportForm({ currentUser, onClose, onSuccess, availableC
             <label className="text-sm font-medium text-foreground block">
               Foto Barang <span className="text-muted-foreground font-normal text-xs">(Opsional)</span>
             </label>
-            
+
             <input
               type="file"
               ref={fileInputRef}

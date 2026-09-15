@@ -1,27 +1,27 @@
 import React, { useState, useMemo, FormEvent } from 'react';
 import { User, Report, CategoryItem, DEFAULT_CATEGORIES } from '../types';
-import { 
-  Tag, 
-  Plus, 
-  Pencil, 
-  Trash2, 
-  Check, 
-  X, 
-  AlertTriangle, 
-  CheckCircle2, 
-  RefreshCw, 
-  Layers, 
+import {
+  Tag,
+  Plus,
+  Pencil,
+  Trash2,
+  Check,
+  X,
+  AlertTriangle,
+  CheckCircle2,
+  RefreshCw,
+  Layers,
   Search,
   ArrowRight
 } from 'lucide-react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  updateDoc, 
-  deleteDoc, 
-  writeBatch 
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  writeBatch
 } from 'firebase/firestore';
 
 interface CategoryManagementProps {
@@ -243,8 +243,7 @@ export default function CategoryManagement({
       await deleteDoc(catDocRef);
 
       setSuccessMsg(
-        `Kategori "${deletingCategory.nama}" berhasil dihapus${
-          affectedReports.length > 0 ? ` dan ${affectedReports.length} laporan dipindahkan ke "${reassignTarget}".` : '.'
+        `Kategori "${deletingCategory.nama}" berhasil dihapus${affectedReports.length > 0 ? ` dan ${affectedReports.length} laporan dipindahkan ke "${reassignTarget}".` : '.'
         }`
       );
       setDeletingCategory(null);
@@ -426,11 +425,10 @@ export default function CategoryManagement({
                 <div
                   key={cat.id_kategori}
                   id={`category-item-${cat.id_kategori}`}
-                  className={`p-3.5 rounded-[var(--radius)] border transition-all ${
-                    isEditing
-                      ? 'border-primary bg-primary/5 shadow-xs'
-                      : 'border-border bg-background hover:border-border/80'
-                  }`}
+                  className={`p-3.5 rounded-[var(--radius)] border transition-all ${isEditing
+                    ? 'border-primary bg-primary/5 shadow-xs'
+                    : 'border-border bg-background hover:border-border/80'
+                    }`}
                 >
                   {isEditing ? (
                     <div className="space-y-3">

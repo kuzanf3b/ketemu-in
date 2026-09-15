@@ -30,9 +30,8 @@ export default function ReportCard({ report, onClick }: ReportCardProps) {
       layout
       whileHover={{ y: -2, transition: { duration: 0.15 } }}
       onClick={onClick}
-      className={`group relative bg-card text-card-foreground rounded-[var(--radius)] overflow-hidden border border-border transition-all duration-150 cursor-pointer shadow-sm hover:shadow hover:bg-accent/40 flex flex-col h-full ${
-        isSolved ? 'opacity-85' : ''
-      }`}
+      className={`group relative bg-card text-card-foreground rounded-[var(--radius)] overflow-hidden border border-border transition-all duration-150 cursor-pointer shadow-sm hover:shadow hover:bg-accent/40 flex flex-col h-full ${isSolved ? 'opacity-85' : ''
+        }`}
     >
       {/* Thumbnail & Badges */}
       <div className="relative aspect-[4/3] w-full bg-muted overflow-hidden border-b border-border">
@@ -46,11 +45,10 @@ export default function ReportCard({ report, onClick }: ReportCardProps) {
         {/* Top Badges */}
         <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 z-10">
           <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide shadow-xs ${
-              isLost
-                ? 'bg-[var(--chart-1)] text-white'
-                : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
-            }`}
+            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide shadow-xs ${isLost
+              ? 'bg-[var(--chart-1)] text-white'
+              : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
+              }`}
           >
             {report.tipe_laporan}
           </span>

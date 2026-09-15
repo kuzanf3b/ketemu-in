@@ -55,11 +55,10 @@ export default function ConfirmModal({
             {/* Icon & Title */}
             <div className="flex items-start gap-3 mt-1">
               <div
-                className={`p-2.5 rounded-[var(--radius)] shrink-0 border ${
-                  isDanger
-                    ? 'bg-error-background text-error border-error'
-                    : 'bg-success-background text-success border-success'
-                }`}
+                className={`p-2.5 rounded-[var(--radius)] shrink-0 border ${isDanger
+                  ? 'bg-error-background text-error border-error'
+                  : 'bg-success-background text-success border-success'
+                  }`}
               >
                 {isDanger ? (
                   <AlertTriangle className="w-5 h-5" />
@@ -89,11 +88,10 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onConfirm}
-                className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius)] transition-opacity hover:opacity-90 shadow-xs cursor-pointer ${
-                  isDanger
-                    ? 'bg-destructive text-destructive-foreground'
-                    : 'bg-primary text-primary-foreground'
-                }`}
+                className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius)] transition-opacity hover:opacity-90 shadow-xs cursor-pointer ${isDanger
+                  ? 'bg-destructive text-destructive-foreground'
+                  : 'bg-primary text-primary-foreground'
+                  }`}
               >
                 {confirmText}
               </button>

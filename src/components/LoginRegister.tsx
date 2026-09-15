@@ -75,7 +75,7 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
 
         const uid = userCredential.user.uid;
         const userDocRef = doc(db, 'users', uid);
-        
+
         let userDoc;
         try {
           userDoc = await getDoc(userDocRef);
@@ -160,11 +160,10 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             setIsLogin(true);
             setError('');
           }}
-          className={`flex-1 min-h-[44px] py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${
-            isLogin
+          className={`flex-1 min-h-[44px] py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${isLogin
               ? 'text-foreground border-b-2 border-primary bg-card font-semibold'
               : 'text-muted-foreground hover:text-foreground'
-          }`}
+            }`}
         >
           Masuk
         </button>
@@ -175,11 +174,10 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
             setIsLogin(false);
             setError('');
           }}
-          className={`flex-1 min-h-[44px] py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${
-            !isLogin
+          className={`flex-1 min-h-[44px] py-3 text-center font-medium text-xs tracking-wider transition-colors cursor-pointer ${!isLogin
               ? 'text-foreground border-b-2 border-primary bg-card font-semibold'
               : 'text-muted-foreground hover:text-foreground'
-          }`}
+            }`}
         >
           Daftar Baru
         </button>

@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Report, Category, DEFAULT_CATEGORIES } from '../types';
 import ReportCard from './ReportCard';
 import ThemeToggle from './ThemeToggle';
-import { 
-  Search, 
-  ArrowRight, 
-  Compass, 
+import {
+  Search,
+  ArrowRight,
+  Compass,
   FileText,
   AlertCircle,
   X,
@@ -66,7 +66,7 @@ export default function LandingPage({
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased">
-      
+
       {/* Top Header Navbar */}
       <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-3.5 flex justify-between items-center">
@@ -110,7 +110,7 @@ export default function LandingPage({
           <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-foreground leading-tight sm:leading-tight">
             Lapor dan Temukan Barang Hilang di Lingkungan RW 04
           </h2>
-          
+
           <p className="text-xs sm:text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl mx-auto">
             Papan informasi warga untuk memposting barang hilang atau temuan dan menghubungkan pelapor langsung melalui WhatsApp.
           </p>
@@ -203,7 +203,7 @@ export default function LandingPage({
 
       {/* Reports Board Section */}
       <section id="laporan-terkini-section" className="py-8 sm:py-12 max-w-6xl w-full mx-auto px-4 sm:px-6 flex-1">
-        
+
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div>
             <h3 className="font-serif text-xl sm:text-2xl font-semibold text-foreground tracking-tight">Papan Laporan Warga</h3>
@@ -211,7 +211,7 @@ export default function LandingPage({
               Daftar barang hilang dan barang temuan terbaru di lingkungan RW 04.
             </p>
           </div>
-          
+
           <div className="flex items-start gap-2.5 rounded-[var(--radius)] border border-info bg-info-background p-3 max-w-md shadow-xs">
             <Info className="w-4 h-4 text-info shrink-0 mt-0.5" />
             <p className="text-[11px] sm:text-xs text-foreground leading-relaxed">
@@ -222,7 +222,7 @@ export default function LandingPage({
 
         {/* Filter Controls (Sticky on mobile if needed, fluid on tablet/desktop) */}
         <div className="bg-card rounded-[var(--radius)] p-3.5 sm:p-4 border border-border space-y-3 mb-6 shadow-xs">
-          
+
           {/* Main search and status toggle */}
           <div className="flex flex-col sm:flex-row gap-2.5">
             <div className="relative flex-1">
@@ -255,13 +255,12 @@ export default function LandingPage({
                   key={tipe}
                   id={`landing-status-filter-${tipe}`}
                   onClick={() => setSelectedTipe(tipe)}
-                  className={`min-h-[34px] px-2 sm:px-3 py-1 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer whitespace-nowrap ${
-                    selectedTipe === tipe
+                  className={`min-h-[34px] px-2 sm:px-3 py-1 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer whitespace-nowrap ${selectedTipe === tipe
                       ? tipe === 'HILANG'
                         ? 'bg-[var(--chart-1)] text-white shadow-xs'
                         : 'bg-primary text-primary-foreground shadow-xs'
                       : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                    }`}
                 >
                   {tipe === 'HILANG' ? 'Hilang' : tipe === 'DITEMUKAN' ? 'Temuan' : 'Semua'}
                 </button>
@@ -277,11 +276,10 @@ export default function LandingPage({
                 key={cat}
                 id={`landing-category-filter-${cat}`}
                 onClick={() => setSelectedCategory(cat)}
-                className={`min-h-[32px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 transition-colors cursor-pointer border whitespace-nowrap ${
-                  selectedCategory === cat
+                className={`min-h-[32px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 transition-colors cursor-pointer border whitespace-nowrap ${selectedCategory === cat
                     ? 'border-primary bg-primary text-primary-foreground font-semibold'
                     : 'border-border bg-background sm:bg-card text-muted-foreground hover:text-foreground hover:bg-muted'
-                }`}
+                  }`}
               >
                 {cat}
               </button>

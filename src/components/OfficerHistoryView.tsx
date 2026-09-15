@@ -358,11 +358,10 @@ export default function OfficerHistoryView({
           <button
             id="tab-history-all"
             onClick={() => setCurrentTab('all')}
-            className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
-              currentTab === 'all'
+            className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${currentTab === 'all'
                 ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
                 : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-            }`}
+              }`}
           >
             <History className="w-3.5 h-3.5" />
             <span>Semua Riwayat</span>
@@ -372,11 +371,10 @@ export default function OfficerHistoryView({
           <button
             id="tab-history-archived"
             onClick={() => setCurrentTab('archived')}
-            className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
-              currentTab === 'archived'
+            className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${currentTab === 'archived'
                 ? 'bg-destructive text-destructive-foreground font-semibold shadow-xs'
                 : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-            }`}
+              }`}
           >
             <Archive className="w-3.5 h-3.5" />
             <span>Arsip Dihapus</span>
@@ -386,11 +384,10 @@ export default function OfficerHistoryView({
           <button
             id="tab-history-resolved"
             onClick={() => setCurrentTab('resolved')}
-            className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
-              currentTab === 'resolved'
+            className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${currentTab === 'resolved'
                 ? 'bg-success text-success-foreground font-semibold shadow-xs'
                 : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-            }`}
+              }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Selesai / Tuntas</span>
@@ -400,11 +397,10 @@ export default function OfficerHistoryView({
           <button
             id="tab-history-rejected"
             onClick={() => setCurrentTab('rejected')}
-            className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
-              currentTab === 'rejected'
+            className={`min-h-[34px] px-3.5 py-1.5 rounded-[var(--radius)] font-medium transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${currentTab === 'rejected'
                 ? 'bg-warning text-warning-foreground font-semibold shadow-xs'
                 : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
-            }`}
+              }`}
           >
             <AlertTriangle className="w-3.5 h-3.5" />
             <span>Ditolak</span>
@@ -587,11 +583,10 @@ export default function OfficerHistoryView({
                       {/* Tipe Laporan */}
                       <td className="py-3.5 px-3">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                            item.tipe_laporan === 'HILANG'
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${item.tipe_laporan === 'HILANG'
                               ? 'bg-[var(--chart-1)] text-white'
                               : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
-                          }`}
+                            }`}
                         >
                           {item.tipe_laporan}
                         </span>
@@ -648,8 +643,8 @@ export default function OfficerHistoryView({
                           {isArchived
                             ? `Dihapus: ${formatDate(item.deleted_at)}`
                             : isSolved
-                            ? `Selesai: ${formatDate(item.selesai_at)}`
-                            : `Dibuat: ${formatDate(item.created_at)}`}
+                              ? `Selesai: ${formatDate(item.selesai_at)}`
+                              : `Dibuat: ${formatDate(item.created_at)}`}
                         </div>
                       </td>
 
@@ -710,11 +705,10 @@ export default function OfficerHistoryView({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1 mb-1">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                            item.tipe_laporan === 'HILANG'
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${item.tipe_laporan === 'HILANG'
                               ? 'bg-[var(--chart-1)] text-white'
                               : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
-                          }`}
+                            }`}
                         >
                           {item.tipe_laporan}
                         </span>
@@ -792,11 +786,10 @@ export default function OfficerHistoryView({
                 <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        selectedItem.data.tipe_laporan === 'HILANG'
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${selectedItem.data.tipe_laporan === 'HILANG'
                           ? 'bg-[var(--chart-1)] text-white'
                           : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
-                      }`}
+                        }`}
                     >
                       {selectedItem.data.tipe_laporan}
                     </span>

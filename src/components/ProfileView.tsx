@@ -61,7 +61,7 @@ export default function ProfileView({
       try {
         const parsed = JSON.parse(err.message);
         if (parsed?.error) msg = parsed.error;
-      } catch {}
+      } catch { }
       alert(msg);
     }
   };
@@ -82,7 +82,7 @@ export default function ProfileView({
         deletedByUid: currentUser.id_user,
         deletedByName: currentUser.nama_lengkap || 'Warga',
         deletedByRole: isOfficer ? 'petugas' : 'warga',
-        deleteReason: isOfficer 
+        deleteReason: isOfficer
           ? 'Dihapus secara manual oleh Petugas RW'
           : 'Dihapus secara manual oleh Pemilik Laporan (Warga)'
       });
@@ -93,7 +93,7 @@ export default function ProfileView({
       try {
         const parsed = JSON.parse(err.message);
         if (parsed?.error) msg = parsed.error;
-      } catch {}
+      } catch { }
       alert(msg);
     }
   };
@@ -184,9 +184,8 @@ export default function ProfileView({
                 key={report.id_report}
                 layout
                 onClick={() => onReportClick(report)}
-                className={`p-3 sm:p-3.5 bg-card hover:bg-accent border border-border rounded-[var(--radius)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-colors cursor-pointer shadow-xs ${
-                  report.status_selesai ? 'opacity-85' : ''
-                }`}
+                className={`p-3 sm:p-3.5 bg-card hover:bg-accent border border-border rounded-[var(--radius)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-colors cursor-pointer shadow-xs ${report.status_selesai ? 'opacity-85' : ''
+                  }`}
               >
                 <div className="flex items-center gap-3 overflow-hidden">
                   <img
@@ -198,11 +197,10 @@ export default function ProfileView({
                   <div className="overflow-hidden space-y-1">
                     <div className="flex items-center gap-1.5">
                       <span
-                        className={`px-2 py-0.2 text-[10px] font-semibold rounded-full ${
-                          report.tipe_laporan === 'HILANG'
+                        className={`px-2 py-0.2 text-[10px] font-semibold rounded-full ${report.tipe_laporan === 'HILANG'
                             ? 'bg-[var(--chart-1)] text-white'
                             : 'bg-[var(--chart-2)] text-[var(--primary-foreground)]'
-                        }`}
+                          }`}
                       >
                         {report.tipe_laporan}
                       </span>
@@ -211,9 +209,8 @@ export default function ProfileView({
                         <span className="truncate">{report.kategori}</span>
                       </span>
                     </div>
-                    <h4 className={`text-xs sm:text-sm font-semibold text-foreground truncate ${
-                      report.status_selesai ? 'line-through text-muted-foreground' : ''
-                    }`}>
+                    <h4 className={`text-xs sm:text-sm font-semibold text-foreground truncate ${report.status_selesai ? 'line-through text-muted-foreground' : ''
+                      }`}>
                       {report.judul}
                     </h4>
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-muted-foreground">
