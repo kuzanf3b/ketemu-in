@@ -66,7 +66,7 @@ export default function ProfileView({
       try {
         const parsed = JSON.parse(err.message);
         if (parsed?.error) msg = parsed.error;
-      } catch { }
+      } catch {}
       alert(msg);
     }
   };
@@ -98,7 +98,7 @@ export default function ProfileView({
       try {
         const parsed = JSON.parse(err.message);
         if (parsed?.error) msg = parsed.error;
-      } catch { }
+      } catch {}
       alert(msg);
     }
   };
@@ -117,7 +117,7 @@ export default function ProfileView({
       alert(
         `Akun Anda berhasil dihapus.${
           result.archivedReportsCount > 0
-            ? ` ${result.archivedReportsCount} laporan Anda telah disimpan ke Arsip Petugas demi keamanan informasi warga.`
+            ? ` ${result.archivedReportsCount} laporan dipindahkan ke Arsip Petugas.`
             : ''
         }`
       );
@@ -216,8 +216,8 @@ export default function ProfileView({
 
         {userReports.length === 0 ? (
           <div className="bg-card rounded-[var(--radius)] p-8 sm:p-10 text-center border border-border">
-            <p className="text-foreground text-sm font-medium">Belum ada laporan yang Anda buat.</p>
-            <p className="text-xs text-muted-foreground mt-1">Gunakan tombol Buat Laporan untuk memposting barang hilang atau temuan.</p>
+            <p className="text-foreground text-sm font-medium">Belum ada laporan.</p>
+            <p className="text-xs text-muted-foreground mt-1">Buat laporan barang hilang atau temuan.</p>
           </div>
         ) : (
           <div className="space-y-2.5">
@@ -318,7 +318,7 @@ export default function ProfileView({
               Zona Berbahaya: Hapus Akun Saya
             </h4>
             <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 max-w-xl leading-relaxed">
-              Menghapus akun Anda dari RW 04. Seluruh laporan aktif Anda akan otomatis dialihkan ke Arsip Petugas demi rekam jejak barang warga (Opsi C).
+              Laporan aktif Anda akan dipindahkan ke Arsip Petugas saat akun dihapus.
             </p>
           </div>
           <button
@@ -337,7 +337,7 @@ export default function ProfileView({
       <ConfirmModal
         isOpen={pendingResolveReport !== null}
         title="Tandai Selesai / Ketemu"
-        message={`Tandai laporan "${pendingResolveReport?.judul}" sebagai SELESAI? Laporan yang sudah selesai akan terhapus otomatis dari sistem setelah 24 jam.`}
+        message={`Tandai "${pendingResolveReport?.judul}" sebagai selesai? Laporan akan terhapus otomatis setelah 24 jam.`}
         confirmText="Ya, Selesai"
         cancelText="Batal"
         onConfirm={executeResolve}
@@ -347,7 +347,7 @@ export default function ProfileView({
       <ConfirmModal
         isOpen={pendingDeleteReport !== null}
         title="Hapus Laporan"
-        message={`Hapus laporan "${pendingDeleteReport?.judul}" secara permanen?`}
+        message={`Hapus laporan "${pendingDeleteReport?.judul}"?`}
         confirmText="Hapus"
         cancelText="Batal"
         onConfirm={executeDelete}
@@ -357,10 +357,10 @@ export default function ProfileView({
 
       <ConfirmModal
         isOpen={showDeleteAccountModal}
-        title="Konfirmasi Hapus Akun"
-        message={`Apakah Anda yakin ingin menghapus akun Anda? ${
+        title="Hapus Akun"
+        message={`Hapus akun Anda? ${
           userReports.length > 0
-            ? `\n\n📌 OPSI C DIJALANKAN: ${userReports.length} laporan milik Anda akan otomatis dipindahkan ke Arsip Petugas agar feed warga tetap bersih namun riwayat barang tetap tercatat.`
+            ? `${userReports.length} laporan akan dipindahkan ke Arsip Petugas.`
             : ''
         }`}
         confirmText={isDeletingAccount ? 'Menghapus...' : 'Hapus Akun Saya'}

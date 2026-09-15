@@ -114,8 +114,8 @@ export default function UserManagement({
       setSuccessMsg(
         `Akun warga "${userToDel.nama_lengkap}" berhasil dihapus. ${
           result.archivedReportsCount > 0
-            ? `${result.archivedReportsCount} laporan aktif otomatis dialihkan ke Arsip Petugas.`
-            : 'Warga ini tidak memiliki laporan aktif.'
+            ? `${result.archivedReportsCount} laporan aktif dipindahkan ke Arsip Petugas.`
+            : 'Tidak ada laporan aktif.'
         }`
       );
       setSelectedUserToDelete(null);
@@ -125,7 +125,7 @@ export default function UserManagement({
       }
     } catch (err: any) {
       console.error('Failed to delete user:', err);
-      let msg = err.message || 'Gagal menghapus user.';
+      let msg = err.message || 'Gagal menghapus akun warga.';
       try {
         const parsed = JSON.parse(err.message);
         if (parsed?.error) msg = parsed.error;
@@ -142,7 +142,7 @@ export default function UserManagement({
         <AlertTriangle className="w-10 h-10 text-warning mx-auto mb-3" />
         <h3 className="font-serif text-lg font-semibold text-foreground">Akses Khusus Petugas</h3>
         <p className="text-xs text-muted-foreground mt-1.5">
-          Halaman manajemen akun warga hanya dapat diakses oleh akun Petugas RW 04.
+          Halaman ini hanya dapat diakses oleh Petugas RW 04.
         </p>
       </div>
     );
@@ -164,7 +164,7 @@ export default function UserManagement({
             </h2>
           </div>
           <p className="text-xs text-muted-foreground max-w-2xl leading-relaxed">
-            Kelola data akun warga RW 04. Penghapusan akun menggunakan <strong>Opsi C (Smart Archive)</strong>: Laporan aktif warga akan otomatis dipindahkan ke arsip petugas agar feed publik tetap bersih dan rekam jejak riwayat tetap aman.
+            Kelola akun warga RW 04. Laporan aktif dari akun yang dihapus akan dipindahkan ke Arsip Petugas.
           </p>
         </div>
 
@@ -182,7 +182,7 @@ export default function UserManagement({
       <div className="bg-info-background border border-info rounded-[var(--radius)] p-3.5 flex items-start gap-2.5 text-xs text-foreground shadow-2xs">
         <Info className="w-4 h-4 text-info shrink-0 mt-0.5" />
         <div className="leading-relaxed">
-          <strong>Kebijakan Relasi Data (Opsi C):</strong> Saat Anda menghapus akun warga, sistem tidak akan menghilangkan data barang hilang/temuan begitu saja. Seluruh laporan yang bersangkutan langsung disimpan ke <strong>Arsip Riwayat Petugas</strong> dengan catatan audit otomatis.
+          <strong>Informasi:</strong> Laporan terkait tetap tersimpan di <strong>Arsip Riwayat Petugas</strong> dan dilengkapi catatan audit saat akun dihapus.
         </div>
       </div>
 
@@ -329,7 +329,7 @@ export default function UserManagement({
                             type="button"
                             onClick={() => setSelectedUserToDelete(user)}
                             className="min-h-[32px] px-2.5 py-1 text-xs font-medium text-destructive hover:bg-destructive/10 border border-destructive/30 rounded-[var(--radius)] transition-colors inline-flex items-center gap-1 cursor-pointer"
-                            title="Hapus Akun Warga & Arsipkan Laporannya"
+                            title="Hapus akun warga dan arsipkan laporannya"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             <span>Hapus Akun</span>
@@ -348,17 +348,16 @@ export default function UserManagement({
       {/* Deletion Confirmation Modal */}
       <ConfirmModal
         isOpen={selectedUserToDelete !== null}
-        title="Hapus Akun Warga & Arsipkan Laporan"
+        title="Hapus Akun dan Arsipkan Laporan"
         message={
           selectedUserToDelete
-            ? `Apakah Anda yakin ingin menghapus akun "${selectedUserToDelete.nama_lengkap}"? ${
-                selectedUserCounts && selectedUserCounts.total > 0
-                  ? `\n\n📌 OPSI C DIJALANKAN: ${selectedUserCounts.total} laporan milik warga ini (${selectedUserCounts.active} aktif, ${selectedUserCounts.resolved} selesai) akan otomatis dipindahkan ke Arsip Petugas agar feed publik tetap bersih dan riwayat tersimpan aman.`
-                  : '\nWarga ini belum memiliki laporan tersimpan.'
-              }`
+            ? `Hapus akun "${selectedUserToDelete.nama_lengkap}"? ${selectedUserCounts && selectedUserCounts.total > 0
+              ? `${selectedUserCounts.total} laporan akan dipindahkan ke Arsip Petugas (${selectedUserCounts.active} aktif, ${selectedUserCounts.resolved} selesai).`
+              : 'Akun ini belum memiliki laporan.'
+            }`
             : ''
         }
-        confirmText={isDeleting ? 'Memproses Arsip...' : 'Hapus & Arsipkan'}
+        confirmText={isDeleting ? 'Menghapus...' : 'Hapus & Arsipkan'}
         cancelText="Batal"
         onConfirm={handleExecuteDeleteUser}
         onCancel={() => setSelectedUserToDelete(null)}
