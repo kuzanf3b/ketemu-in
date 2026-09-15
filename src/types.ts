@@ -6,7 +6,7 @@ export interface User {
   is_admin?: boolean;
 }
 
-export type TipeLaporan = 'HILANG' | 'DITEMUKAN';
+export type TipeLaporan = "HILANG" | "DITEMUKAN";
 
 export interface Report {
   id_report: string;
@@ -54,17 +54,17 @@ export interface ArchivedReport {
   deleted_at: string;
   deleted_by_uid: string;
   deleted_by_name: string;
-  deleted_by_role: 'petugas' | 'warga' | 'sistem';
+  deleted_by_role: "petugas" | "warga" | "sistem";
   delete_reason: string;
 }
 
 export const DEFAULT_CATEGORIES: string[] = [
-  'Elektronik',
-  'Kunci',
-  'Dompet',
-  'Hewan',
-  'Dokumen',
-  'Lainnya',
+  "Elektronik",
+  "Kunci",
+  "Dompet",
+  "Hewan",
+  "Dokumen",
+  "Lainnya",
 ];
 
 export type Category = string;

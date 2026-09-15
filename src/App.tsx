@@ -419,11 +419,10 @@ export default function App() {
               <button
                 id="nav-btn-home"
                 onClick={() => setCurrentTab("home")}
-                className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-                  currentTab === "home"
+                className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "home"
                     ? "bg-card text-foreground font-semibold shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 <Compass className="w-3.5 h-3.5" />
                 <span>Beranda</span>
@@ -433,11 +432,10 @@ export default function App() {
                 <button
                   id="nav-btn-approval"
                   onClick={() => setCurrentTab("approval")}
-                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-                    currentTab === "approval"
+                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "approval"
                       ? "bg-card text-foreground font-semibold shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
                   <span>Persetujuan</span>
@@ -453,11 +451,10 @@ export default function App() {
                 <button
                   id="nav-btn-categories"
                   onClick={() => setCurrentTab("categories")}
-                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-                    currentTab === "categories"
+                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "categories"
                       ? "bg-card text-foreground font-semibold shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   <Tag className="w-3.5 h-3.5" />
                   <span>Kategori</span>
@@ -468,11 +465,10 @@ export default function App() {
                 <button
                   id="nav-btn-history"
                   onClick={() => setCurrentTab("history")}
-                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-                    currentTab === "history"
+                  className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "history"
                       ? "bg-card text-foreground font-semibold shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   <History className="w-3.5 h-3.5" />
                   <span>Riwayat</span>
@@ -482,11 +478,10 @@ export default function App() {
               <button
                 id="nav-btn-profile"
                 onClick={() => setCurrentTab("profile")}
-                className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-                  currentTab === "profile"
+                className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "profile"
                     ? "bg-card text-foreground font-semibold shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 <UserRound className="w-3.5 h-3.5" />
                 <span>Profil</span>
@@ -620,13 +615,12 @@ export default function App() {
                       key={tipe}
                       id={`status-filter-${tipe}`}
                       onClick={() => setSelectedTipe(tipe)}
-                      className={`min-h-[34px] px-2 sm:px-3 py-1 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer whitespace-nowrap ${
-                        selectedTipe === tipe
+                      className={`min-h-[34px] px-2 sm:px-3 py-1 text-center text-xs font-semibold rounded-[var(--radius)] transition-colors cursor-pointer whitespace-nowrap ${selectedTipe === tipe
                           ? tipe === "HILANG"
                             ? "bg-[var(--chart-1)] text-white shadow-xs"
                             : "bg-primary text-primary-foreground shadow-xs"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       {tipe === "HILANG"
                         ? "Hilang"
@@ -648,11 +642,10 @@ export default function App() {
                     key={cat}
                     id={`category-filter-${cat}`}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`min-h-[32px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 transition-colors cursor-pointer border whitespace-nowrap ${
-                      selectedCategory === cat
+                    className={`min-h-[32px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 transition-colors cursor-pointer border whitespace-nowrap ${selectedCategory === cat
                         ? "border-primary bg-primary text-primary-foreground font-semibold"
                         : "border-border bg-background sm:bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
+                      }`}
                   >
                     {cat}
                   </button>
@@ -753,11 +746,10 @@ export default function App() {
         <button
           id="mobile-nav-btn-home"
           onClick={() => setCurrentTab("home")}
-          className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
-            currentTab === "home"
+          className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "home"
               ? "text-foreground font-semibold"
               : "text-muted-foreground"
-          }`}
+            }`}
         >
           <Compass className="w-5 h-5 mb-0.5" />
           <span className="text-[10px]">Beranda</span>
@@ -767,11 +759,10 @@ export default function App() {
           <button
             id="mobile-nav-btn-approval"
             onClick={() => setCurrentTab("approval")}
-            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer relative ${
-              currentTab === "approval"
+            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer relative ${currentTab === "approval"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
-            }`}
+              }`}
           >
             <div className="relative">
               <SlidersHorizontal className="w-5 h-5 mb-0.5" />
@@ -789,11 +780,10 @@ export default function App() {
           <button
             id="mobile-nav-btn-categories"
             onClick={() => setCurrentTab("categories")}
-            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
-              currentTab === "categories"
+            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "categories"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
-            }`}
+              }`}
           >
             <Tag className="w-5 h-5 mb-0.5" />
             <span className="text-[10px]">Kategori</span>
@@ -804,11 +794,10 @@ export default function App() {
           <button
             id="mobile-nav-btn-history"
             onClick={() => setCurrentTab("history")}
-            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
-              currentTab === "history"
+            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "history"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
-            }`}
+              }`}
           >
             <History className="w-5 h-5 mb-0.5" />
             <span className="text-[10px]">Riwayat</span>
@@ -818,11 +807,10 @@ export default function App() {
         <button
           id="mobile-nav-btn-profile"
           onClick={() => setCurrentTab("profile")}
-          className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${
-            currentTab === "profile"
+          className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] py-1 px-2 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "profile"
               ? "text-foreground font-semibold"
               : "text-muted-foreground"
-          }`}
+            }`}
         >
           <UserRound className="w-5 h-5 mb-0.5" />
           <span className="text-[10px]">Profil</span>

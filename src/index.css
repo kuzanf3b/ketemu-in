@@ -5,7 +5,7 @@
   * {
     border-color: var(--border);
   }
-  
+
   html {
     font-family: var(--font-sans);
     letter-spacing: var(--letter-spacing);
