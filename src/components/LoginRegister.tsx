@@ -19,8 +19,23 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [phoneWarning, setPhoneWarning] = useState('');
+  const [rtRwWarning, setRtRwWarning] = useState('');
   const [loading, setLoading] = useState(false);
   const [isPetugas, setIsPetugas] = useState(false);
+
+  const isValidRtRw = (value: string) =>
+    /^RT\s*\d{1,3}\s*\/\s*RW\s*\d{1,3}$/i.test(value.trim());
+
+  const handleRtRwChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setRtRw(value);
+
+    if (value.trim() && !isValidRtRw(value)) {
+      setRtRwWarning('Gunakan format RT 03 / RW 04.');
+    } else {
+      setRtRwWarning('');
+    }
+  };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
@@ -42,6 +57,13 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
 
     if (!noWhatsapp || !password || (!isLogin && !namaLengkap)) {
       setError('Harap lengkapi semua bidang.');
+      setLoading(false);
+      return;
+    }
+
+    if (!isLogin && !isValidRtRw(rtRw)) {
+      setError('Domisili harus menggunakan format RT 03 / RW 04.');
+      setRtRwWarning('Gunakan format RT 03 / RW 04.');
       setLoading(false);
       return;
     }
@@ -236,10 +258,20 @@ export default function LoginRegister({ onLoginSuccess }: LoginRegisterProps) {
                   type="text"
                   placeholder="Contoh: RT 03 / RW 04"
                   value={rtRw}
-                  onChange={(e) => setRtRw(e.target.value)}
+                  onChange={handleRtRwChange}
+                  pattern="^RT\s*[0-9]{1,3}\s*/\s*RW\s*[0-9]{1,3}$"
+                  title="Gunakan format RT 03 / RW 04"
+                  maxLength={20}
                   className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-background border border-border rounded-[var(--radius)] focus:outline-none focus:ring-2 focus:ring-ring text-foreground min-h-[42px]"
+                  required
                 />
               </div>
+              {rtRwWarning && (
+                <div className="flex items-center gap-1.5 p-2 rounded-[var(--radius)] border border-warning bg-warning-background text-foreground text-[11px]">
+                  <AlertTriangle className="w-3.5 h-3.5 text-warning shrink-0" />
+                  <span>{rtRwWarning}</span>
+                </div>
+              )}
             </div>
           )}
 
