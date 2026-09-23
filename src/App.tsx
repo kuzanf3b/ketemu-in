@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { User, Report, Category, CategoryItem, DEFAULT_CATEGORIES } from "./types";
 import LoginRegister from "./components/LoginRegister";
 import ReportCard from "./components/ReportCard";
@@ -36,6 +37,8 @@ import logoBlack from "./assets/logo-black.png";
 import logoWhite from "./assets/logo-white.png";
 
 export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem("ketemuin_user");
     return saved ? JSON.parse(saved) : null;
@@ -63,11 +66,18 @@ export default function App() {
     setIsDark((prev) => !prev);
   };
 
-  const [viewState, setViewState] = useState<"landing" | "login">("landing");
-
-  const [currentTab, setCurrentTab] = useState<
-    "home" | "profile" | "approval" | "categories" | "history" | "users"
-  >("home");
+  const currentTab =
+    location.pathname === "/dashboard/profile"
+      ? "profile"
+      : location.pathname === "/dashboard/approval"
+        ? "approval"
+        : location.pathname === "/dashboard/categories"
+          ? "categories"
+          : location.pathname === "/dashboard/history"
+            ? "history"
+            : location.pathname === "/dashboard/users"
+              ? "users"
+              : "home";
   const [reports, setReports] = useState<Report[]>([]);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [categoryNames, setCategoryNames] = useState<string[]>(DEFAULT_CATEGORIES);
@@ -131,6 +141,39 @@ export default function App() {
   // Modals state
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  useEffect(() => {
+    if (!authInitialized) return;
+
+    const isDashboardRoute = location.pathname.startsWith("/dashboard");
+    const isKnownRoute =
+      location.pathname === "/" ||
+      location.pathname === "/login" ||
+      location.pathname === "/dashboard" ||
+      [
+        "/dashboard/profile",
+        "/dashboard/approval",
+        "/dashboard/categories",
+        "/dashboard/history",
+        "/dashboard/users",
+      ].includes(location.pathname);
+
+    if (!isKnownRoute) {
+      navigate(currentUser ? "/dashboard" : "/", { replace: true });
+    } else if (!currentUser && isDashboardRoute) {
+      navigate("/", { replace: true });
+    } else if (currentUser && (location.pathname === "/" || location.pathname === "/login")) {
+      navigate("/dashboard", { replace: true });
+    } else if (
+      currentUser &&
+      !currentUser.is_admin &&
+      ["/dashboard/approval", "/dashboard/categories", "/dashboard/history", "/dashboard/users"].includes(
+        location.pathname,
+      )
+    ) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [authInitialized, currentUser, location.pathname, navigate]);
 
   const hasActiveFilters =
     searchQuery !== "" ||
@@ -270,6 +313,7 @@ export default function App() {
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
     localStorage.setItem("ketemuin_user", JSON.stringify(user));
+    navigate("/dashboard", { replace: true });
   };
 
   const handleLogout = async () => {
@@ -280,7 +324,7 @@ export default function App() {
     }
     setCurrentUser(null);
     localStorage.removeItem("ketemuin_user");
-    setCurrentTab("home");
+    navigate("/", { replace: true });
   };
 
   const handleReportCreated = () => {
@@ -341,7 +385,7 @@ export default function App() {
   }
 
   if (!currentUser) {
-    if (viewState === "landing") {
+    if (location.pathname !== "/login") {
       return (
         <>
           <LandingPage
@@ -353,7 +397,7 @@ export default function App() {
             setSelectedCategory={setSelectedCategory}
             selectedTipe={selectedTipe}
             setSelectedTipe={setSelectedTipe}
-            onNavigateToLogin={() => setViewState("login")}
+            onNavigateToLogin={() => navigate("/login")}
             onReportClick={(report) => setSelectedReport(report)}
             isDark={isDark}
             onToggleTheme={toggleTheme}
@@ -378,7 +422,7 @@ export default function App() {
       <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4 relative antialiased">
         <div className="w-full max-w-md flex justify-between items-center mb-4">
           <button
-            onClick={() => setViewState("landing")}
+            onClick={() => navigate("/")}
             className="min-h-[38px] px-3 py-1.5 bg-card hover:bg-muted text-foreground border border-border text-xs font-medium rounded-[var(--radius)] flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
@@ -420,7 +464,7 @@ export default function App() {
             <div className="hidden sm:flex bg-muted p-1 rounded-[var(--radius)] border border-border">
               <button
                 id="nav-btn-home"
-                onClick={() => setCurrentTab("home")}
+                onClick={() => navigate("/dashboard")}
                 className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "home"
                     ? "bg-card text-foreground font-semibold shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
@@ -433,7 +477,7 @@ export default function App() {
               {currentUser?.is_admin && (
                 <button
                   id="nav-btn-approval"
-                  onClick={() => setCurrentTab("approval")}
+                  onClick={() => navigate("/dashboard/approval")}
                   className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "approval"
                       ? "bg-card text-foreground font-semibold shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
@@ -452,7 +496,7 @@ export default function App() {
               {currentUser?.is_admin && (
                 <button
                   id="nav-btn-categories"
-                  onClick={() => setCurrentTab("categories")}
+                  onClick={() => navigate("/dashboard/categories")}
                   className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "categories"
                       ? "bg-card text-foreground font-semibold shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
@@ -466,7 +510,7 @@ export default function App() {
               {currentUser?.is_admin && (
                 <button
                   id="nav-btn-history"
-                  onClick={() => setCurrentTab("history")}
+                  onClick={() => navigate("/dashboard/history")}
                   className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "history"
                       ? "bg-card text-foreground font-semibold shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
@@ -480,7 +524,7 @@ export default function App() {
               {currentUser?.is_admin && (
                 <button
                   id="nav-btn-users"
-                  onClick={() => setCurrentTab("users")}
+                  onClick={() => navigate("/dashboard/users")}
                   className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "users"
                       ? "bg-card text-foreground font-semibold shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
@@ -493,7 +537,7 @@ export default function App() {
 
               <button
                 id="nav-btn-profile"
-                onClick={() => setCurrentTab("profile")}
+                onClick={() => navigate("/dashboard/profile")}
                 className={`min-h-[34px] px-3 py-1 rounded-[var(--radius)] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${currentTab === "profile"
                     ? "bg-card text-foreground font-semibold shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
@@ -685,7 +729,7 @@ export default function App() {
                 {currentUser?.is_admin && (
                   <button
                     id="btn-shortcut-kelola-kategori"
-                    onClick={() => setCurrentTab("categories")}
+                    onClick={() => navigate("/dashboard/categories")}
                     className="min-h-[32px] px-2.5 py-1 rounded-[var(--radius)] text-xs font-medium shrink-0 bg-secondary text-secondary-foreground hover:bg-muted border border-border transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1.5 ml-auto"
                     title="Kelola Kategori Barang (Khusus Petugas)"
                   >
@@ -768,7 +812,7 @@ export default function App() {
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border px-2 py-2 flex justify-around items-center">
         <button
           id="mobile-nav-btn-home"
-          onClick={() => setCurrentTab("home")}
+          onClick={() => navigate("/dashboard")}
           className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "home"
               ? "text-foreground font-semibold"
               : "text-muted-foreground"
@@ -781,7 +825,7 @@ export default function App() {
         {currentUser?.is_admin && (
           <button
             id="mobile-nav-btn-approval"
-            onClick={() => setCurrentTab("approval")}
+            onClick={() => navigate("/dashboard/approval")}
             className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer relative ${currentTab === "approval"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
@@ -802,7 +846,7 @@ export default function App() {
         {currentUser?.is_admin && (
           <button
             id="mobile-nav-btn-categories"
-            onClick={() => setCurrentTab("categories")}
+            onClick={() => navigate("/dashboard/categories")}
             className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "categories"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
@@ -816,7 +860,7 @@ export default function App() {
         {currentUser?.is_admin && (
           <button
             id="mobile-nav-btn-history"
-            onClick={() => setCurrentTab("history")}
+            onClick={() => navigate("/dashboard/history")}
             className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "history"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
@@ -830,7 +874,7 @@ export default function App() {
         {currentUser?.is_admin && (
           <button
             id="mobile-nav-btn-users"
-            onClick={() => setCurrentTab("users")}
+            onClick={() => navigate("/dashboard/users")}
             className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "users"
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground"
@@ -843,7 +887,7 @@ export default function App() {
 
         <button
           id="mobile-nav-btn-profile"
-          onClick={() => setCurrentTab("profile")}
+          onClick={() => navigate("/dashboard/profile")}
           className={`flex flex-col items-center justify-center min-w-[48px] min-h-[44px] py-1 px-1.5 rounded-[var(--radius)] transition-colors cursor-pointer ${currentTab === "profile"
               ? "text-foreground font-semibold"
               : "text-muted-foreground"
