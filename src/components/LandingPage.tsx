@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Report, Category, DEFAULT_CATEGORIES } from '../types';
 import ReportCard from './ReportCard';
 import ThemeToggle from './ThemeToggle';
@@ -13,9 +13,34 @@ import {
   Plus,
   Info
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import logoBlack from '../assets/logo-black.png';
 import logoWhite from '../assets/logo-white.png';
+
+function useCountUp(target: number, duration = 900) {
+  const [value, setValue] = useState(0);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setValue(target);
+      return;
+    }
+
+    let frame = 0;
+    const startedAt = performance.now();
+    const update = (now: number) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      setValue(Math.round(target * (1 - Math.pow(1 - progress, 3))));
+      if (progress < 1) frame = requestAnimationFrame(update);
+    };
+
+    frame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(frame);
+  }, [duration, reduceMotion, target]);
+
+  return value;
+}
 
 interface LandingPageProps {
   reports: Report[];
@@ -48,6 +73,10 @@ export default function LandingPage({
   onToggleTheme,
   availableCategories,
 }: LandingPageProps) {
+  const { scrollY } = useScroll();
+  const reduceMotion = useReducedMotion();
+  const heroBackgroundY = useTransform(scrollY, [0, 700], [0, reduceMotion ? 0 : 110]);
+  const heroAccentY = useTransform(scrollY, [0, 700], [0, reduceMotion ? 0 : -65]);
   const categoryChips: string[] = ['Semua', ...(availableCategories && availableCategories.length > 0 ? availableCategories : DEFAULT_CATEGORIES)];
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
@@ -55,6 +84,10 @@ export default function LandingPage({
   const totalHilang = reports.filter(r => r.tipe_laporan === 'HILANG' && !r.status_selesai).length;
   const totalDitemukan = reports.filter(r => r.tipe_laporan === 'DITEMUKAN' && !r.status_selesai).length;
   const totalSelesai = reports.filter(r => r.status_selesai).length;
+  const animatedTotalPost = useCountUp(totalPost);
+  const animatedTotalHilang = useCountUp(totalHilang);
+  const animatedTotalDitemukan = useCountUp(totalDitemukan);
+  const animatedTotalSelesai = useCountUp(totalSelesai);
 
   const hasActiveFilters = searchQuery !== '' || selectedCategory !== 'Semua' || selectedTipe !== 'Semua';
 
@@ -100,8 +133,20 @@ export default function LandingPage({
       </header>
 
       {/* Hero Section */}
-      <section className="py-10 sm:py-14 md:py-20 border-b border-border bg-card/30">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-4 sm:space-y-5">
+      <section className="relative isolate overflow-hidden py-10 sm:py-14 md:py-20 border-b border-border bg-card/30">
+        <motion.div style={{ y: heroBackgroundY }} className="pointer-events-none absolute inset-x-0 -top-24 -z-10 h-[34rem] opacity-50">
+          <div className="absolute left-[8%] top-24 h-32 w-32 rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute right-[10%] top-40 h-44 w-44 rounded-full bg-[var(--chart-1)]/10 blur-3xl" />
+          <div className="absolute inset-x-0 top-28 mx-auto h-64 max-w-3xl rounded-[50%] border border-primary/10 [transform:perspective(700px)_rotateX(65deg)]" />
+        </motion.div>
+        <motion.div style={{ y: heroAccentY }} className="pointer-events-none absolute right-[12%] top-20 hidden h-10 w-10 rotate-12 rounded-xl border border-primary/20 bg-card/70 shadow-lg sm:block" />
+        <motion.div style={{ y: heroAccentY }} className="pointer-events-none absolute bottom-16 left-[14%] hidden h-6 w-6 -rotate-12 rounded-full bg-[var(--chart-1)]/20 sm:block" />
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: 'easeOut' }}
+          className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center space-y-4 sm:space-y-5"
+        >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/80 border border-border text-[11px] sm:text-xs text-foreground font-medium">
             <span className="w-2 h-2 rounded-full bg-[var(--chart-1)] animate-pulse"></span>
             Pusat Informasi & Penemuan Warga RW 04
@@ -136,68 +181,73 @@ export default function LandingPage({
               Buat Laporan Baru
             </button>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Real Statistics Row (Responsive grid: 2 cols on mobile, 4 on tablet/desktop) */}
       <section className="py-4 sm:py-6 bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 text-center">
-            <div className="p-2.5 sm:p-3 bg-background/60 sm:bg-transparent rounded-[var(--radius)] sm:rounded-none border sm:border-0 border-border">
-              <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground uppercase tracking-wider block truncate">Total Laporan</span>
-              <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-0.5 block">{totalPost}</span>
-            </div>
-            <div className="p-2.5 sm:p-3 bg-background/60 sm:bg-transparent rounded-[var(--radius)] sm:rounded-none border sm:border-0 border-border md:border-l md:border-border">
-              <span className="text-[10px] sm:text-[11px] font-medium text-[var(--chart-1)] uppercase tracking-wider block truncate">Barang Hilang</span>
-              <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-[var(--chart-1)] mt-0.5 block">{totalHilang}</span>
-            </div>
-            <div className="p-2.5 sm:p-3 bg-background/60 sm:bg-transparent rounded-[var(--radius)] sm:rounded-none border sm:border-0 border-border md:border-l md:border-border">
-              <span className="text-[10px] sm:text-[11px] font-medium text-foreground uppercase tracking-wider block truncate">Ditemukan</span>
-              <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-0.5 block">{totalDitemukan}</span>
-            </div>
-            <div className="p-2.5 sm:p-3 bg-background/60 sm:bg-transparent rounded-[var(--radius)] sm:rounded-none border sm:border-0 border-border md:border-l md:border-border">
-              <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground uppercase tracking-wider block truncate">Selesai / Kembali</span>
-              <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-muted-foreground mt-0.5 block">{totalSelesai}</span>
-            </div>
-          </div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.35 }}
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 text-center"
+          >
+            {[
+              ['Total Laporan', animatedTotalPost, 'text-foreground'],
+              ['Barang Hilang', animatedTotalHilang, 'text-[var(--chart-1)]'],
+              ['Ditemukan', animatedTotalDitemukan, 'text-foreground'],
+              ['Selesai / Kembali', animatedTotalSelesai, 'text-muted-foreground'],
+            ].map(([label, value, color], index) => (
+              <motion.div
+                key={label as string}
+                variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}
+                className={`p-2.5 sm:p-3 bg-background/60 sm:bg-transparent rounded-[var(--radius)] sm:rounded-none border sm:border-0 border-border ${index > 0 ? 'md:border-l md:border-border' : ''}`}
+              >
+                <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground uppercase tracking-wider block truncate">{label}</span>
+                <span className={`font-serif text-xl sm:text-2xl md:text-3xl font-bold ${color} mt-0.5 block`}>{value}</span>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
       {/* How it works */}
       <section className="py-8 sm:py-12 border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="mb-6 sm:mb-8">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.45 }} className="mb-6 sm:mb-8">
             <h3 className="font-serif text-xl sm:text-2xl font-semibold text-foreground tracking-tight">Cara Kerja</h3>
             <p className="text-xs text-muted-foreground mt-1">
               Alur pelaporan dan serah terima barang di lingkungan warga.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
-            <div className="p-4 sm:p-5 bg-card rounded-[var(--radius)] border border-border space-y-2">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.14 } } }} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
+            <motion.div variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } }} whileHover={reduceMotion ? undefined : { y: -4 }} className="p-4 sm:p-5 bg-card rounded-[var(--radius)] border border-border space-y-2">
               <span className="font-serif text-lg sm:text-xl font-bold text-muted-foreground">01</span>
               <h4 className="font-sans text-sm font-semibold text-foreground">Laporkan Barang</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Isi rincian nama barang, kategori, foto, perkiraan lokasi, dan tanggal kejadian.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="p-4 sm:p-5 bg-card rounded-[var(--radius)] border border-border space-y-2">
+            <motion.div variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } }} whileHover={reduceMotion ? undefined : { y: -4 }} className="p-4 sm:p-5 bg-card rounded-[var(--radius)] border border-border space-y-2">
               <span className="font-serif text-lg sm:text-xl font-bold text-muted-foreground">02</span>
               <h4 className="font-sans text-sm font-semibold text-foreground">Cek Papan Pengumuman</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Warga dapat menelusuri laporan aktif berdasarkan kategori dan kata kunci pencarian.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="p-4 sm:p-5 bg-card rounded-[var(--radius)] border border-border space-y-2 sm:col-span-2 md:col-span-1">
+            <motion.div variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } }} whileHover={reduceMotion ? undefined : { y: -4 }} className="p-4 sm:p-5 bg-card rounded-[var(--radius)] border border-border space-y-2 sm:col-span-2 md:col-span-1">
               <span className="font-serif text-lg sm:text-xl font-bold text-muted-foreground">03</span>
               <h4 className="font-sans text-sm font-semibold text-foreground">Hubungi & Serah Terima</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Hubungi pelapor via WhatsApp untuk verifikasi kepemilikan dan serah terima barang.
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -321,14 +371,21 @@ export default function LandingPage({
         ) : (
           <motion.div
             layout
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4"
           >
             {reports.map((report) => (
-              <ReportCard
+              <motion.div
                 key={report.id_report}
-                report={report}
-                onClick={() => onReportClick(report)}
-              />
+                variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}
+              >
+                <ReportCard
+                  report={report}
+                  onClick={() => onReportClick(report)}
+                />
+              </motion.div>
             ))}
           </motion.div>
         )}
